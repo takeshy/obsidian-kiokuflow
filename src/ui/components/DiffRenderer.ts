@@ -160,13 +160,13 @@ function renderWordDiff(
   for (const change of changes) {
     if (change.added) {
       if (side === "new") {
-        const span = contentEl.createSpan({ cls: "gemihub-diff-word-added" });
+        const span = contentEl.createSpan({ cls: "kiokuflow-diff-word-added" });
         span.textContent = change.value;
       }
       // Skip added parts on old side
     } else if (change.removed) {
       if (side === "old") {
-        const span = contentEl.createSpan({ cls: "gemihub-diff-word-removed" });
+        const span = contentEl.createSpan({ cls: "kiokuflow-diff-word-removed" });
         span.textContent = change.value;
       }
       // Skip removed parts on new side
@@ -220,25 +220,25 @@ function renderUnifiedView(
   diffLines: DiffLine[],
   linePairs: Map<number, LinePair>,
 ): void {
-  container.addClass("gemihub-diff-unified");
-  container.removeClass("gemihub-diff-split");
+  container.addClass("kiokuflow-diff-unified");
+  container.removeClass("kiokuflow-diff-split");
 
   for (let idx = 0; idx < diffLines.length; idx++) {
     const line = diffLines[idx];
     const lineEl = container.createDiv({
-      cls: `gemihub-diff-line gemihub-diff-${line.type}`,
+      cls: `kiokuflow-diff-line kiokuflow-diff-${line.type}`,
     });
 
     // Old line number
-    const oldNumEl = lineEl.createSpan({ cls: "gemihub-diff-linenum gemihub-diff-linenum-old" });
+    const oldNumEl = lineEl.createSpan({ cls: "kiokuflow-diff-linenum kiokuflow-diff-linenum-old" });
     oldNumEl.textContent = line.oldLineNum != null ? String(line.oldLineNum) : "";
 
     // New line number
-    const newNumEl = lineEl.createSpan({ cls: "gemihub-diff-linenum gemihub-diff-linenum-new" });
+    const newNumEl = lineEl.createSpan({ cls: "kiokuflow-diff-linenum kiokuflow-diff-linenum-new" });
     newNumEl.textContent = line.newLineNum != null ? String(line.newLineNum) : "";
 
     // Gutter (+/-/space)
-    const gutterEl = lineEl.createSpan({ cls: "gemihub-diff-gutter" });
+    const gutterEl = lineEl.createSpan({ cls: "kiokuflow-diff-gutter" });
     if (line.type === "removed") {
       gutterEl.textContent = "-";
     } else if (line.type === "added") {
@@ -248,7 +248,7 @@ function renderUnifiedView(
     }
 
     // Content with optional word-level diff
-    const contentEl = lineEl.createSpan({ cls: "gemihub-diff-content" });
+    const contentEl = lineEl.createSpan({ cls: "kiokuflow-diff-content" });
     const pair = linePairs.get(idx);
     if (pair && line.type === "removed") {
       renderWordDiff(contentEl, pair.removedContent, pair.addedContent, "old");
@@ -268,26 +268,26 @@ function renderSplitView(
   diffLines: DiffLine[],
   linePairs: Map<number, LinePair>,
 ): void {
-  container.addClass("gemihub-diff-split");
-  container.removeClass("gemihub-diff-unified");
+  container.addClass("kiokuflow-diff-split");
+  container.removeClass("kiokuflow-diff-unified");
 
   const rows = pairLinesForSplitView(diffLines);
 
   for (const row of rows) {
-    const rowEl = container.createDiv({ cls: "gemihub-diff-split-row" });
+    const rowEl = container.createDiv({ cls: "kiokuflow-diff-split-row" });
 
     // Left side (old)
     const leftEl = rowEl.createDiv({
-      cls: `gemihub-diff-split-cell gemihub-diff-split-left ${row.left ? `gemihub-diff-${row.left.type}` : "gemihub-diff-split-filler"}`,
+      cls: `kiokuflow-diff-split-cell kiokuflow-diff-split-left ${row.left ? `kiokuflow-diff-${row.left.type}` : "kiokuflow-diff-split-filler"}`,
     });
     if (row.left) {
-      const lineNumEl = leftEl.createSpan({ cls: "gemihub-diff-linenum" });
+      const lineNumEl = leftEl.createSpan({ cls: "kiokuflow-diff-linenum" });
       lineNumEl.textContent = row.left.oldLineNum != null ? String(row.left.oldLineNum) : "";
 
-      const gutterEl = leftEl.createSpan({ cls: "gemihub-diff-gutter" });
+      const gutterEl = leftEl.createSpan({ cls: "kiokuflow-diff-gutter" });
       gutterEl.textContent = row.left.type === "removed" ? "-" : " ";
 
-      const contentEl = leftEl.createSpan({ cls: "gemihub-diff-content" });
+      const contentEl = leftEl.createSpan({ cls: "kiokuflow-diff-content" });
       const pair = linePairs.get(row.leftIndex);
       if (pair && row.left.type === "removed") {
         renderWordDiff(contentEl, pair.removedContent, pair.addedContent, "old");
@@ -298,16 +298,16 @@ function renderSplitView(
 
     // Right side (new)
     const rightEl = rowEl.createDiv({
-      cls: `gemihub-diff-split-cell gemihub-diff-split-right ${row.right ? `gemihub-diff-${row.right.type}` : "gemihub-diff-split-filler"}`,
+      cls: `kiokuflow-diff-split-cell kiokuflow-diff-split-right ${row.right ? `kiokuflow-diff-${row.right.type}` : "kiokuflow-diff-split-filler"}`,
     });
     if (row.right) {
-      const lineNumEl = rightEl.createSpan({ cls: "gemihub-diff-linenum" });
+      const lineNumEl = rightEl.createSpan({ cls: "kiokuflow-diff-linenum" });
       lineNumEl.textContent = row.right.newLineNum != null ? String(row.right.newLineNum) : "";
 
-      const gutterEl = rightEl.createSpan({ cls: "gemihub-diff-gutter" });
+      const gutterEl = rightEl.createSpan({ cls: "kiokuflow-diff-gutter" });
       gutterEl.textContent = row.right.type === "added" ? "+" : " ";
 
-      const contentEl = rightEl.createSpan({ cls: "gemihub-diff-content" });
+      const contentEl = rightEl.createSpan({ cls: "kiokuflow-diff-content" });
       const pair = linePairs.get(row.rightIndex);
       if (pair && row.right.type === "added") {
         renderWordDiff(contentEl, pair.removedContent, pair.addedContent, "new");
@@ -330,12 +330,12 @@ export function renderDiffView(
   const diffLines = computeLineDiff(oldText, newText);
   const linePairs = buildLinePairs(diffLines);
 
-  const container = parentEl.createDiv({ cls: "gemihub-diff-view" });
+  const container = parentEl.createDiv({ cls: "kiokuflow-diff-view" });
   let currentMode = viewMode ?? "split";
 
   function rerender() {
     container.empty();
-    container.className = "gemihub-diff-view";
+    container.className = "kiokuflow-diff-view";
     if (currentMode === "unified") {
       renderUnifiedView(container, diffLines, linePairs);
     } else {
@@ -368,14 +368,14 @@ export function createDiffViewToggle(
   parentEl: HTMLElement,
   state: DiffRendererState
 ): void {
-  const toggle = parentEl.createDiv({ cls: "gemihub-diff-view-toggle" });
+  const toggle = parentEl.createDiv({ cls: "kiokuflow-diff-view-toggle" });
   const unifiedBtn = toggle.createEl("button", {
     text: t("diff.unifiedView"),
-    cls: `gemihub-diff-view-toggle-btn${state.viewMode === "unified" ? " is-active" : ""}`,
+    cls: `kiokuflow-diff-view-toggle-btn${state.viewMode === "unified" ? " is-active" : ""}`,
   });
   const splitBtn = toggle.createEl("button", {
     text: t("diff.splitView"),
-    cls: `gemihub-diff-view-toggle-btn${state.viewMode === "split" ? " is-active" : ""}`,
+    cls: `kiokuflow-diff-view-toggle-btn${state.viewMode === "split" ? " is-active" : ""}`,
   });
 
   unifiedBtn.addEventListener("click", () => {

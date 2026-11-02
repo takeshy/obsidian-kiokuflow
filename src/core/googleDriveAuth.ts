@@ -1,6 +1,6 @@
 // Google Drive authentication for Obsidian.
-// Uses RSA hybrid encrypted auth exported from GemiHub.
-// Token refresh is proxied through GemiHub API (clientId/clientSecret stay server-side).
+// Uses RSA hybrid encrypted auth exported from kiokuflow.
+// Token refresh is proxied through kiokuflow API (clientId/clientSecret stay server-side).
 
 import { requestUrl } from "obsidian";
 import { findFileByExactName, readFile } from "./googleDrive";
@@ -18,11 +18,11 @@ import {
 import type { DriveSessionTokens } from "src/types";
 
 // Token, _encrypted-auth.json and refresh message formats are shared with
-// GemiHub web and Desktop (gemihub-sync-core/auth); only the transport
+// kiokuflow web and Desktop (gemihub-sync-core/auth); only the transport
 // (Obsidian requestUrl) lives here.
 
 /**
- * Decode a GemiHub Migration Tool token (hex-encoded XOR 0x5a payload).
+ * Decode a kiokuflow Migration Tool token (hex-encoded XOR 0x5a payload).
  * Returns { accessToken, rootFolderId }.
  */
 export function decodeBackupToken(hexToken: string): { accessToken: string; rootFolderId: string } {
@@ -39,7 +39,7 @@ export async function fetchEncryptedAuth(
 ): Promise<EncryptedAuthFile> {
   const file = await findFileByExactName(accessToken, ENCRYPTED_AUTH_FILE_NAME, rootFolderId);
   if (!file) {
-    throw new Error("_encrypted-auth.json not found on Drive. Export from GemiHub first.");
+    throw new Error("_encrypted-auth.json not found on Drive. Export from kiokuflow first.");
   }
   return parseEncryptedAuthFile(await readFile(accessToken, file.id));
 }
@@ -58,7 +58,7 @@ export async function decryptAuthData(
 }
 
 /**
- * Refresh the access token via GemiHub API proxy.
+ * Refresh the access token via kiokuflow API proxy.
  * The server holds clientId/clientSecret and forwards to Google; rootFolderId
  * lets it resolve the account that owns the synced Drive folder.
  */

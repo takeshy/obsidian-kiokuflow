@@ -26,7 +26,7 @@ export class ConfirmModal extends Modal {
     contentEl.empty();
     contentEl.createEl("p", { text: this.message });
 
-    const actions = contentEl.createDiv({ cls: "gemihub-modal-actions" });
+    const actions = contentEl.createDiv({ cls: "kiokuflow-modal-actions" });
 
     const confirmBtn = actions.createEl("button", {
       text: this.confirmText,

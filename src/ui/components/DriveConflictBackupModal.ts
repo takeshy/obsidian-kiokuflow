@@ -43,12 +43,12 @@ export class DriveConflictBackupModal extends Modal {
   private render(): void {
     const { contentEl } = this;
     contentEl.empty();
-    contentEl.addClass("gemihub-drive-manage-modal");
+    contentEl.addClass("kiokuflow-drive-manage-modal");
 
     contentEl.createEl("h2", { text: `${t("driveSync.conflictBackupsTitle")} (${this.files.length})` });
 
     if (this.loading || this.processing) {
-      const el = contentEl.createDiv({ cls: "gemihub-drive-modal-processing" });
+      const el = contentEl.createDiv({ cls: "kiokuflow-drive-modal-processing" });
       el.createEl("div", { cls: "spinner" });
       el.createEl("div", { text: this.processing ? t("driveSync.processing") : t("driveSync.loading") });
       return;
@@ -71,7 +71,7 @@ export class DriveConflictBackupModal extends Modal {
       );
 
     // File list
-    const listEl = contentEl.createDiv({ cls: "gemihub-drive-file-list" });
+    const listEl = contentEl.createDiv({ cls: "kiokuflow-drive-file-list" });
     for (const file of this.files) {
       const desc = new Date(file.mtime).toLocaleString();
       const displayName = restorePathFromConflictBackupName(file.name);
@@ -97,7 +97,7 @@ export class DriveConflictBackupModal extends Modal {
     }
 
     // Footer
-    const footer = contentEl.createDiv({ cls: "gemihub-drive-modal-footer" });
+    const footer = contentEl.createDiv({ cls: "kiokuflow-drive-modal-footer" });
     const restoreBtn = footer.createEl("button", { text: t("driveSync.conflictRestore"), cls: "mod-cta" });
     restoreBtn.disabled = this.selected.size === 0;
     restoreBtn.addEventListener("click", () => { if (this.selected.size > 0) void this.doRestore(); });
@@ -138,16 +138,16 @@ export class DriveConflictBackupModal extends Modal {
   }
 
   private renderPreviewPanel(container: HTMLElement, file: ConflictBackupEntry): void {
-    const panel = container.createDiv({ cls: "gemihub-drive-preview-panel" });
+    const panel = container.createDiv({ cls: "kiokuflow-drive-preview-panel" });
     if (isBinaryExtension(file.name)) {
-      panel.createDiv({ cls: "gemihub-drive-preview-loading", text: t("driveSync.previewBinary") });
+      panel.createDiv({ cls: "kiokuflow-drive-preview-loading", text: t("driveSync.previewBinary") });
       return;
     }
     const cached = this.previewCache.get(file.path);
     if (cached === undefined) {
-      panel.createDiv({ cls: "gemihub-drive-preview-loading", text: t("driveSync.loading") });
+      panel.createDiv({ cls: "kiokuflow-drive-preview-loading", text: t("driveSync.loading") });
     } else if (cached === null) {
-      panel.createDiv({ cls: "gemihub-drive-preview-loading", text: t("driveSync.previewFailed") });
+      panel.createDiv({ cls: "kiokuflow-drive-preview-loading", text: t("driveSync.previewFailed") });
     } else {
       panel.createEl("pre", { text: cached });
     }

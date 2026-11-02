@@ -1,6 +1,6 @@
 // Sync utility functions for Google Drive sync.
 // Exclusion and file type rules come from gemihub-sync-core (shared with
-// GemiHub web and Desktop); only the Obsidian-specific folders live here.
+// kiokuflow web and Desktop); only the Obsidian-specific folders live here.
 
 import {
   isSyncExcludedPath as isCoreSyncExcludedPath,

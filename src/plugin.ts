@@ -1,6 +1,6 @@
-import { Plugin, TFile, Notice } from "obsidian";
+import { Plugin, TFile, Notice, normalizePath } from "obsidian";
 import {
-  type GemiHubSettings,
+  type KiokuflowSettings,
   type WorkspaceState,
   DEFAULT_SETTINGS,
   DEFAULT_WORKSPACE_STATE,
@@ -20,7 +20,7 @@ const WORKSPACE_STATE_FILENAME = "gemini-workspace.json";
  * constant. Spelled out rather than using structuredClone(), which is missing
  * on iOS below 15.4 — still inside Obsidian's supported range.
  */
-function cloneDefaultSettings(): GemiHubSettings {
+function cloneDefaultSettings(): KiokuflowSettings {
   return {
     ...DEFAULT_SETTINGS,
     driveSync: {
@@ -34,8 +34,8 @@ function cloneDefaultSettings(): GemiHubSettings {
   };
 }
 
-export class GemiHubPlugin extends Plugin {
-  settings: GemiHubSettings = cloneDefaultSettings();
+export class KiokuflowPlugin extends Plugin {
+  settings: KiokuflowSettings = cloneDefaultSettings();
   workspaceState: WorkspaceState = { ...DEFAULT_WORKSPACE_STATE };
   driveSyncManager: DriveSyncManager | null = null;
   driveSyncUI!: DriveSyncUIManager;
@@ -68,7 +68,17 @@ export class GemiHubPlugin extends Plugin {
   // ---- Settings persistence ----
 
   async loadSettings(): Promise<void> {
-    const data = (await this.loadData()) as Partial<GemiHubSettings> | null;
+    let data = (await this.loadData()) as Partial<KiokuflowSettings> | null;
+    let importedLegacySettings = false;
+    if (data == null && this.manifest.id === "kiokuflow") {
+      // The plugin ID determines loadData's location. Import once without
+      // changing the old installation, including its selected Secret Storage ID.
+      const legacyPath = normalizePath(`${this.app.vault.configDir}/plugins/gemihub/data.json`);
+      if (await this.app.vault.adapter.exists(legacyPath)) {
+        data = JSON.parse(await this.app.vault.adapter.read(legacyPath)) as Partial<KiokuflowSettings> | null;
+        importedLegacySettings = data != null;
+      }
+    }
     const defaults = cloneDefaultSettings();
     this.settings = {
       ...defaults,
@@ -80,6 +90,7 @@ export class GemiHubPlugin extends Plugin {
         diff: { ...defaults.editHistory.diff, ...data?.editHistory?.diff },
       },
     };
+    if (importedLegacySettings) await this.saveSettings();
   }
 
   async saveSettings(): Promise<void> {

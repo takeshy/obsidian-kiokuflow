@@ -1,6 +1,6 @@
 // Drive-based edit history persistence (called at Push time)
 // Saves unified diffs to history/files/ on Google Drive,
-// compatible with GemiHub's remote edit history format.
+// compatible with kiokuflow's remote edit history format.
 
 import * as Diff from "diff";
 import * as drive from "./googleDrive";
@@ -174,7 +174,7 @@ export async function clearEditHistoryFromDrive(
 
 /**
  * Save an edit to Drive history (oldContent → newContent forward diff).
- * Compatible with GemiHub's remote edit history format.
+ * Compatible with kiokuflow's remote edit history format.
  *
  * @param historyFolderId - Pre-resolved folder ID from ensureEditHistoryFolderId()
  */

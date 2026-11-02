@@ -55,6 +55,9 @@ export class Setting {}
 export class App {}
 export class Plugin {}
 export class PluginSettingTab {}
+export function normalizePath(path: string): string {
+  return path.replace(/\/+/g, "/").replace(/^\/+|\/+$/g, "");
+}
 export type EventRef = unknown;
 export type DataAdapter = unknown;
 export type Vault = unknown;

@@ -46,14 +46,14 @@ export class DriveTempFilesModal extends Modal {
   private render(): void {
     const { contentEl } = this;
     contentEl.empty();
-    contentEl.addClass("gemihub-drive-manage-modal");
+    contentEl.addClass("kiokuflow-drive-manage-modal");
 
     contentEl.createEl("h2", {
       text: `${t("driveSync.tempFilesTitle")} (${this.entries.length})`,
     });
 
     if (this.loading || this.processing) {
-      const el = contentEl.createDiv({ cls: "gemihub-drive-modal-processing" });
+      const el = contentEl.createDiv({ cls: "kiokuflow-drive-modal-processing" });
       el.createEl("div", { cls: "spinner" });
       el.createEl("div", { text: this.processing ? t("driveSync.processing") : t("driveSync.loading") });
       return;
@@ -76,7 +76,7 @@ export class DriveTempFilesModal extends Modal {
       );
 
     // File list
-    const listEl = contentEl.createDiv({ cls: "gemihub-drive-file-list" });
+    const listEl = contentEl.createDiv({ cls: "kiokuflow-drive-file-list" });
     for (const entry of this.entries) {
       const savedAt = entry.payload.savedAt
         ? t("driveSync.tempFilesSavedAt", { date: new Date(entry.payload.savedAt).toLocaleString() })
@@ -100,13 +100,13 @@ export class DriveTempFilesModal extends Modal {
 
       // Preview panel (content already available in payload)
       if (this.expandedPreview === entry.file.id) {
-        const panel = listEl.createDiv({ cls: "gemihub-drive-preview-panel" });
+        const panel = listEl.createDiv({ cls: "kiokuflow-drive-preview-panel" });
         panel.createEl("pre", { text: entry.payload.content || "" });
       }
     }
 
     // Footer
-    const footer = contentEl.createDiv({ cls: "gemihub-drive-modal-footer" });
+    const footer = contentEl.createDiv({ cls: "kiokuflow-drive-modal-footer" });
     const applyBtn = footer.createEl("button", { text: t("driveSync.tempFilesApply"), cls: "mod-cta" });
     applyBtn.disabled = this.selected.size === 0;
     applyBtn.addEventListener("click", () => { if (this.selected.size > 0) void this.confirmAndApply(); });

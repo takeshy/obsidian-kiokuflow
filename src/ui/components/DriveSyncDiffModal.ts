@@ -1,5 +1,5 @@
 // Sync diff modal for Google Drive sync.
-// Shows file list with expandable diff view, similar to GemiHub's SyncDiffDialog.
+// Shows file list with expandable diff view, similar to kiokuflow's SyncDiffDialog.
 
 import { Modal, App, Notice, Setting, setIcon, TFile } from "obsidian";
 import type { SyncFileListItem, DriveSyncManager } from "src/core/driveSync";
@@ -61,10 +61,10 @@ export class DriveSyncDiffModal extends Modal {
   onOpen(): void {
     const { contentEl, modalEl } = this;
     contentEl.empty();
-    modalEl.addClass("gemihub-sync-diff-modal");
+    modalEl.addClass("kiokuflow-sync-diff-modal");
 
     const title = this.direction === "push" ? t("driveSync.pushChanges") : t("driveSync.pullChanges");
-    const header = contentEl.createDiv({ cls: "gemihub-sync-diff-header gemihub-drag-handle" });
+    const header = contentEl.createDiv({ cls: "kiokuflow-sync-diff-header kiokuflow-drag-handle" });
     this.headerTitleEl = header.createEl("h2", { text: `${title} (${this.files.length})` });
 
     // Setup drag & resize
@@ -77,7 +77,7 @@ export class DriveSyncDiffModal extends Modal {
         cls: "setting-item-description",
       });
     } else {
-      const listEl = contentEl.createDiv({ cls: "gemihub-sync-diff-list" });
+      const listEl = contentEl.createDiv({ cls: "kiokuflow-sync-diff-list" });
 
       for (const file of this.files) {
         this.renderFileItem(listEl, file);
@@ -109,9 +109,9 @@ export class DriveSyncDiffModal extends Modal {
   }
 
   private renderFileItem(listEl: HTMLElement, file: SyncFileListItem): void {
-    const itemCls = file.type === "conflict" ? "gemihub-sync-diff-file is-conflict" : "gemihub-sync-diff-file";
+    const itemCls = file.type === "conflict" ? "kiokuflow-sync-diff-file is-conflict" : "kiokuflow-sync-diff-file";
     const itemEl = listEl.createDiv({ cls: itemCls });
-    const headerEl = itemEl.createDiv({ cls: "gemihub-sync-diff-file-header" });
+    const headerEl = itemEl.createDiv({ cls: "kiokuflow-sync-diff-file-header" });
 
     // Type icon
     let iconName: string;
@@ -119,35 +119,35 @@ export class DriveSyncDiffModal extends Modal {
     switch (file.type) {
       case "new":
         iconName = "plus";
-        iconCls = "gemihub-sync-diff-new";
+        iconCls = "kiokuflow-sync-diff-new";
         break;
       case "modified":
         iconName = "pencil";
-        iconCls = "gemihub-sync-diff-modified";
+        iconCls = "kiokuflow-sync-diff-modified";
         break;
       case "deleted":
         iconName = "trash-2";
-        iconCls = "gemihub-sync-diff-deleted";
+        iconCls = "kiokuflow-sync-diff-deleted";
         break;
       case "renamed":
         iconName = "arrow-right";
-        iconCls = "gemihub-sync-diff-modified";
+        iconCls = "kiokuflow-sync-diff-modified";
         break;
       case "editDeleted":
         iconName = "alert-triangle";
-        iconCls = "gemihub-sync-diff-edit-deleted";
+        iconCls = "kiokuflow-sync-diff-edit-deleted";
         break;
       case "conflict":
         iconName = "git-merge";
-        iconCls = "gemihub-sync-diff-conflict";
+        iconCls = "kiokuflow-sync-diff-conflict";
         break;
     }
 
-    const iconEl = headerEl.createSpan({ cls: `gemihub-sync-diff-icon ${iconCls}` });
+    const iconEl = headerEl.createSpan({ cls: `kiokuflow-sync-diff-icon ${iconCls}` });
     setIcon(iconEl, iconName);
 
     // File name
-    const nameEl = headerEl.createSpan({ cls: "gemihub-sync-diff-name" });
+    const nameEl = headerEl.createSpan({ cls: "kiokuflow-sync-diff-name" });
     if (file.type === "renamed" && file.oldName) {
       nameEl.setText(`${file.oldName} → ${file.name}`);
     } else {
@@ -155,10 +155,10 @@ export class DriveSyncDiffModal extends Modal {
     }
 
     if (file.type === "editDeleted") {
-      const tagEl = headerEl.createSpan({ cls: "gemihub-sync-diff-tag" });
+      const tagEl = headerEl.createSpan({ cls: "kiokuflow-sync-diff-tag" });
       tagEl.setText(t("driveSync.deletedOnRemote"));
     } else if (file.type === "conflict") {
-      const tagEl = headerEl.createSpan({ cls: "gemihub-sync-diff-tag gemihub-sync-diff-conflict-tag" });
+      const tagEl = headerEl.createSpan({ cls: "kiokuflow-sync-diff-tag kiokuflow-sync-diff-conflict-tag" });
       tagEl.setText(t("driveSync.conflictNeedResolve"));
     }
 
@@ -167,7 +167,7 @@ export class DriveSyncDiffModal extends Modal {
     const hasLocal = !(file.type === "deleted" && this.direction === "push")
       && !(file.type === "new" && this.direction === "pull");
     if (canRestore) {
-      const restoreBtn = headerEl.createEl("button", { cls: "gemihub-sync-diff-toggle" });
+      const restoreBtn = headerEl.createEl("button", { cls: "kiokuflow-sync-diff-toggle" });
       restoreBtn.title = file.type === "new" ? t("driveSync.restoreNewTooltip") : t("driveSync.restoreLocalTooltip");
       const restoreIconEl = restoreBtn.createSpan();
       setIcon(restoreIconEl, "rotate-ccw");
@@ -179,7 +179,7 @@ export class DriveSyncDiffModal extends Modal {
       });
     }
     if (hasLocal) {
-      const openBtn = headerEl.createEl("button", { cls: "gemihub-sync-diff-toggle" });
+      const openBtn = headerEl.createEl("button", { cls: "kiokuflow-sync-diff-toggle" });
       const openIconEl = openBtn.createSpan();
       setIcon(openIconEl, "external-link");
       const openLabel = openBtn.createSpan();
@@ -204,7 +204,7 @@ export class DriveSyncDiffModal extends Modal {
     // Ignore toggle (pull only). Set for remote-modified files and for blocked
     // remote renames, so the latter never become an error-only dead end.
     if (this.direction === "pull" && file.ignorable) {
-      const ignoreBtn = headerEl.createEl("button", { cls: "gemihub-sync-diff-toggle" });
+      const ignoreBtn = headerEl.createEl("button", { cls: "kiokuflow-sync-diff-toggle" });
       const ignoreIconEl = ignoreBtn.createSpan();
       setIcon(ignoreIconEl, "eye-off");
       const ignoreLabel = ignoreBtn.createSpan();
@@ -217,12 +217,12 @@ export class DriveSyncDiffModal extends Modal {
           this.ignoredIds.delete(file.id);
           setIcon(ignoreIconEl, "eye-off");
           ignoreLabel.setText(t("driveSync.ignore"));
-          itemEl.removeClass("gemihub-sync-diff-ignored");
+          itemEl.removeClass("kiokuflow-sync-diff-ignored");
         } else {
           this.ignoredIds.add(file.id);
           setIcon(ignoreIconEl, "eye");
           ignoreLabel.setText(t("driveSync.unignore"));
-          itemEl.addClass("gemihub-sync-diff-ignored");
+          itemEl.addClass("kiokuflow-sync-diff-ignored");
         }
         this.updateTitle();
       });
@@ -231,19 +231,19 @@ export class DriveSyncDiffModal extends Modal {
     // Diff toggle button (for non-binary, non-editDeleted, non-conflict files)
     const canDiff = !isBinaryExtension(file.name) && file.type !== "editDeleted" && file.type !== "conflict";
     if (canDiff) {
-      const diffBtn = headerEl.createEl("button", { cls: "gemihub-sync-diff-toggle" });
+      const diffBtn = headerEl.createEl("button", { cls: "kiokuflow-sync-diff-toggle" });
       const chevronEl = diffBtn.createSpan();
       setIcon(chevronEl, "chevron-right");
       const diffLabel = diffBtn.createSpan();
       diffLabel.setText(t("driveSync.diff"));
 
-      const diffPanel = itemEl.createDiv({ cls: "gemihub-sync-diff-panel gemihub-hidden" });
+      const diffPanel = itemEl.createDiv({ cls: "kiokuflow-sync-diff-panel kiokuflow-hidden" });
 
       diffBtn.addEventListener("click", () => {
         void this.handleDiffToggle(file, diffPanel, chevronEl, diffLabel);
       });
     } else if (isBinaryExtension(file.name) && file.type !== "editDeleted") {
-      const noDiffEl = headerEl.createSpan({ cls: "gemihub-sync-diff-no-diff" });
+      const noDiffEl = headerEl.createSpan({ cls: "kiokuflow-sync-diff-no-diff" });
       noDiffEl.setText(t("driveSync.binary"));
     }
   }
@@ -288,7 +288,7 @@ export class DriveSyncDiffModal extends Modal {
     // If already loaded, toggle visibility
     if (state?.oldContent !== null && state?.oldContent !== undefined && !state.error) {
       state.expanded = !state.expanded;
-      panel.toggleClass("gemihub-hidden", !state.expanded);
+      panel.toggleClass("kiokuflow-hidden", !state.expanded);
       setIcon(chevronEl, state.expanded ? "chevron-down" : "chevron-right");
       diffLabel.setText(state.expanded ? t("driveSync.hide") : t("driveSync.diff"));
       return;
@@ -297,7 +297,7 @@ export class DriveSyncDiffModal extends Modal {
     // Prevent duplicate requests while loading
     if (state?.loading) {
       state.expanded = !state.expanded;
-      panel.toggleClass("gemihub-hidden", !state.expanded);
+      panel.toggleClass("kiokuflow-hidden", !state.expanded);
       setIcon(chevronEl, state.expanded ? "chevron-down" : "chevron-right");
       diffLabel.setText(state.expanded ? t("driveSync.hide") : t("driveSync.diff"));
       return;
@@ -305,9 +305,9 @@ export class DriveSyncDiffModal extends Modal {
 
     // Show loading
     this.diffStates[file.id] = { loading: true, oldContent: null, newContent: null, diffRenderer: null, error: false, expanded: true };
-    panel.toggleClass("gemihub-hidden", false);
+    panel.toggleClass("kiokuflow-hidden", false);
     panel.empty();
-    panel.createDiv({ cls: "gemihub-sync-diff-loading", text: t("driveSync.loading") });
+    panel.createDiv({ cls: "kiokuflow-sync-diff-loading", text: t("driveSync.loading") });
     setIcon(chevronEl, "chevron-down");
     diffLabel.setText(t("driveSync.hide"));
 
@@ -359,7 +359,7 @@ export class DriveSyncDiffModal extends Modal {
 
       // Render toggle + diff view
       const defaultMode = (file.type === "new" || file.type === "deleted") ? "unified" : "split";
-      const toggleBar = panel.createDiv({ cls: "gemihub-sync-diff-toggle-bar" });
+      const toggleBar = panel.createDiv({ cls: "kiokuflow-sync-diff-toggle-bar" });
       const diffState = renderDiffView(panel, oldContent, newContent, defaultMode);
       createDiffViewToggle(toggleBar, diffState);
 
@@ -367,7 +367,7 @@ export class DriveSyncDiffModal extends Modal {
     } catch {
       this.diffStates[file.id] = { loading: false, oldContent: null, newContent: null, diffRenderer: null, error: true, expanded: true };
       panel.empty();
-      panel.createDiv({ cls: "gemihub-sync-diff-error", text: t("driveSync.failedToLoadDiff") });
+      panel.createDiv({ cls: "kiokuflow-sync-diff-error", text: t("driveSync.failedToLoadDiff") });
     }
   }
 
@@ -375,7 +375,7 @@ export class DriveSyncDiffModal extends Modal {
     const directions = ["n", "e", "s", "w", "ne", "nw", "se", "sw"];
     for (const dir of directions) {
       const handle = document.createElement("div");
-      handle.className = `gemihub-resize-handle gemihub-resize-${dir}`;
+      handle.className = `kiokuflow-resize-handle kiokuflow-resize-${dir}`;
       modalEl.appendChild(handle);
       this.setupResize(handle, modalEl, dir);
     }

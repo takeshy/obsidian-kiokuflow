@@ -1,5 +1,5 @@
 // Sync diff types and computation. The protocol lives in gemihub-sync-core so
-// Obsidian, GemiHub web and GemiHub Desktop apply identical rules; this module
+// Obsidian, kiokuflow web and kiokuflow Desktop apply identical rules; this module
 // only adds the Obsidian-specific fields.
 
 import {

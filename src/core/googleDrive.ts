@@ -1,6 +1,6 @@
 // Google Drive API client for Obsidian.
 // The REST client (requests, retries, pagination, multipart bodies, errors) is
-// shared with GemiHub web and Desktop through gemihub-sync-core; this module
+// shared with kiokuflow web and Desktop through gemihub-sync-core; this module
 // only adapts Obsidian's requestUrl as the transport.
 
 import { requestUrl } from "obsidian";
@@ -46,7 +46,7 @@ const drive = createDriveClient(requestUrlTransport);
 // Folder operations
 // ========================================
 
-export function ensureRootFolder(accessToken: string, folderName: string = "gemihub"): Promise<string> {
+export function ensureRootFolder(accessToken: string, folderName: string = "kiokuflow"): Promise<string> {
   return drive.ensureRootFolder(accessToken, folderName);
 }
 

@@ -1,1 +1,1 @@
-export { GemiHubPlugin as default } from "./plugin";
+export { KiokuflowPlugin as default } from "./plugin";

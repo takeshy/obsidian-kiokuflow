@@ -1,16 +1,16 @@
-/* GemiHub - Drive Sync styles */
+/* kiokuflow - Drive Sync styles */
 
 /* Utility */
-.gemihub-hidden {
+.kiokuflow-hidden {
   display: none !important;
 }
 
 /* Drive Sync Ribbon Badge */
-.gemihub-drive-sync-ribbon {
+.kiokuflow-drive-sync-ribbon {
   position: relative;
 }
 
-.gemihub-sync-badge {
+.kiokuflow-sync-badge {
   position: absolute;
   top: 2px;
   right: -4px;
@@ -28,17 +28,17 @@
 }
 
 /* Drive Sync Status Bar */
-.gemihub-drive-sync-status {
+.kiokuflow-drive-sync-status {
   cursor: pointer;
 }
 
 /* Settings: Backup Token Input */
-.gemihub-backup-token-input {
+.kiokuflow-backup-token-input {
   width: 300px;
 }
 
 /* Modal Actions (Confirm dialog) */
-.gemihub-modal-actions {
+.kiokuflow-modal-actions {
   display: flex;
   justify-content: flex-end;
   gap: 8px;
@@ -46,7 +46,7 @@
 }
 
 /* Button Container (Conflict modal bulk actions) */
-.gemihub-button-container {
+.kiokuflow-button-container {
   display: flex;
   justify-content: flex-end;
   gap: 8px;
@@ -59,45 +59,45 @@
    Sync Diff Modal
    ======================================== */
 
-.gemihub-sync-diff-modal {
+.kiokuflow-sync-diff-modal {
   max-width: 90vw;
   max-height: 80vh;
   width: 800px;
   height: 500px;
 }
 
-.gemihub-sync-diff-modal .modal-content {
+.kiokuflow-sync-diff-modal .modal-content {
   height: 100%;
   display: flex;
   flex-direction: column;
   padding: 0;
 }
 
-.gemihub-sync-diff-header {
+.kiokuflow-sync-diff-header {
   padding: 16px;
   border-bottom: 1px solid var(--background-modifier-border);
 }
 
-.gemihub-sync-diff-header h2 {
+.kiokuflow-sync-diff-header h2 {
   margin: 0;
 }
 
-.gemihub-sync-diff-list {
+.kiokuflow-sync-diff-list {
   flex: 1;
   overflow-y: auto;
   margin: 0;
   padding: 8px 0;
 }
 
-.gemihub-sync-diff-file {
+.kiokuflow-sync-diff-file {
   border-bottom: 1px solid var(--background-modifier-border);
 }
 
-.gemihub-sync-diff-file:last-child {
+.kiokuflow-sync-diff-file:last-child {
   border-bottom: none;
 }
 
-.gemihub-sync-diff-file-header {
+.kiokuflow-sync-diff-file-header {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -106,11 +106,11 @@
   min-width: 0;
 }
 
-.gemihub-sync-diff-file-header:hover {
+.kiokuflow-sync-diff-file-header:hover {
   background: var(--background-modifier-hover);
 }
 
-.gemihub-sync-diff-icon {
+.kiokuflow-sync-diff-icon {
   flex-shrink: 0;
   width: 18px;
   height: 18px;
@@ -119,40 +119,40 @@
   justify-content: center;
 }
 
-.gemihub-sync-diff-new {
+.kiokuflow-sync-diff-new {
   color: var(--text-success);
 }
 
-.gemihub-sync-diff-modified {
+.kiokuflow-sync-diff-modified {
   color: var(--text-accent);
 }
 
-.gemihub-sync-diff-deleted {
+.kiokuflow-sync-diff-deleted {
   color: var(--text-error);
 }
 
-.gemihub-sync-diff-edit-deleted {
+.kiokuflow-sync-diff-edit-deleted {
   color: var(--text-warning);
 }
 
-.gemihub-sync-diff-conflict {
+.kiokuflow-sync-diff-conflict {
   color: var(--text-muted);
 }
 
-.gemihub-sync-diff-conflict-tag {
+.kiokuflow-sync-diff-conflict-tag {
   color: var(--text-muted);
   background: var(--background-modifier-border);
 }
 
-.gemihub-sync-diff-file.is-conflict {
+.kiokuflow-sync-diff-file.is-conflict {
   opacity: 0.6;
 }
 
-.gemihub-sync-diff-file.gemihub-sync-diff-ignored {
+.kiokuflow-sync-diff-file.kiokuflow-sync-diff-ignored {
   opacity: 0.5;
 }
 
-.gemihub-sync-diff-name {
+.kiokuflow-sync-diff-name {
   flex: 1;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -160,7 +160,7 @@
   font-size: 13px;
 }
 
-.gemihub-sync-diff-tag {
+.kiokuflow-sync-diff-tag {
   font-size: 11px;
   color: var(--text-warning);
   background: var(--background-modifier-hover);
@@ -169,7 +169,7 @@
   white-space: nowrap;
 }
 
-.gemihub-sync-diff-toggle {
+.kiokuflow-sync-diff-toggle {
   display: flex;
   align-items: center;
   gap: 4px;
@@ -182,35 +182,35 @@
   font-size: 12px;
 }
 
-.gemihub-sync-diff-toggle:first-of-type {
+.kiokuflow-sync-diff-toggle:first-of-type {
   margin-left: auto;
 }
 
-.gemihub-sync-diff-toggle:hover {
+.kiokuflow-sync-diff-toggle:hover {
   background: var(--background-modifier-hover);
   color: var(--text-normal);
 }
 
-.gemihub-sync-diff-no-diff {
+.kiokuflow-sync-diff-no-diff {
   font-size: 11px;
   color: var(--text-faint);
   margin-left: auto;
 }
 
-.gemihub-sync-diff-panel {
+.kiokuflow-sync-diff-panel {
   border-top: 1px solid var(--background-modifier-border);
   margin: 0 8px 8px;
   overflow: hidden;
 }
 
-.gemihub-duplicate-choices {
+.kiokuflow-duplicate-choices {
   display: flex;
   flex-direction: column;
   gap: 6px;
   margin: 8px 0;
 }
 
-.gemihub-duplicate-choice {
+.kiokuflow-duplicate-choice {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -218,19 +218,19 @@
   font-size: var(--font-ui-smaller);
 }
 
-.gemihub-sync-diff-panel .gemihub-diff-view {
+.kiokuflow-sync-diff-panel .kiokuflow-diff-view {
   overflow-x: auto;
   max-width: 100%;
 }
 
-.gemihub-sync-diff-loading {
+.kiokuflow-sync-diff-loading {
   padding: 12px;
   text-align: center;
   color: var(--text-muted);
   font-size: 13px;
 }
 
-.gemihub-sync-diff-error {
+.kiokuflow-sync-diff-error {
   padding: 12px;
   text-align: center;
   color: var(--text-error);
@@ -241,13 +241,13 @@
    DiffRenderer: Unified / Split View
    ======================================== */
 
-.gemihub-sync-diff-toggle-bar {
+.kiokuflow-sync-diff-toggle-bar {
   display: flex;
   justify-content: flex-end;
   padding: 4px 8px;
 }
 
-.gemihub-diff-view {
+.kiokuflow-diff-view {
   font-family: var(--font-monospace);
   font-size: 12px;
   line-height: 1.5;
@@ -256,32 +256,32 @@
   padding: 0;
 }
 
-.gemihub-diff-line {
+.kiokuflow-diff-line {
   display: flex;
   white-space: pre;
   min-height: 1.5em;
   padding: 0 8px;
 }
 
-.gemihub-diff-removed {
+.kiokuflow-diff-removed {
   background: rgba(255, 100, 100, 0.15);
 }
 
-.gemihub-diff-added {
+.kiokuflow-diff-added {
   background: rgba(0, 200, 83, 0.15);
 }
 
-.theme-dark .gemihub-diff-removed {
+.theme-dark .kiokuflow-diff-removed {
   background: rgba(255, 100, 100, 0.12);
 }
 
-.theme-dark .gemihub-diff-added {
+.theme-dark .kiokuflow-diff-added {
   background: rgba(0, 200, 83, 0.12);
 }
 
 /* Line Numbers */
 
-.gemihub-diff-linenum {
+.kiokuflow-diff-linenum {
   flex-shrink: 0;
   width: 40px;
   text-align: right;
@@ -293,7 +293,7 @@
 
 /* Gutter (+/-/space) */
 
-.gemihub-diff-gutter {
+.kiokuflow-diff-gutter {
   flex-shrink: 0;
   width: 16px;
   text-align: center;
@@ -303,7 +303,7 @@
 
 /* Content */
 
-.gemihub-diff-content {
+.kiokuflow-diff-content {
   flex: 1;
   min-width: 0;
 }
@@ -312,7 +312,7 @@
    View Toggle (Unified / Split)
    ======================================== */
 
-.gemihub-diff-view-toggle {
+.kiokuflow-diff-view-toggle {
   display: inline-flex;
   gap: 0;
   margin-left: auto;
@@ -321,7 +321,7 @@
   overflow: hidden;
 }
 
-.gemihub-diff-view-toggle-btn {
+.kiokuflow-diff-view-toggle-btn {
   padding: 2px 10px;
   font-size: 11px;
   cursor: pointer;
@@ -332,16 +332,16 @@
   line-height: 1.4;
 }
 
-.gemihub-diff-view-toggle-btn:last-child {
+.kiokuflow-diff-view-toggle-btn:last-child {
   border-right: none;
 }
 
-.gemihub-diff-view-toggle-btn.is-active {
+.kiokuflow-diff-view-toggle-btn.is-active {
   background: var(--interactive-accent);
   color: var(--text-on-accent);
 }
 
-.gemihub-diff-view-toggle-btn:hover:not(.is-active) {
+.kiokuflow-diff-view-toggle-btn:hover:not(.is-active) {
   background: var(--background-modifier-hover);
 }
 
@@ -349,13 +349,13 @@
    Split (Side-by-Side) View
    ======================================== */
 
-.gemihub-diff-split .gemihub-diff-split-row {
+.kiokuflow-diff-split .kiokuflow-diff-split-row {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   border-bottom: 1px solid var(--background-modifier-border-focus);
 }
 
-.gemihub-diff-split-cell {
+.kiokuflow-diff-split-cell {
   min-width: 0;
   display: flex;
   white-space: pre;
@@ -365,16 +365,16 @@
   line-height: 1.5;
 }
 
-.gemihub-diff-split-cell .gemihub-diff-content {
+.kiokuflow-diff-split-cell .kiokuflow-diff-content {
   white-space: break-spaces;
   overflow-wrap: anywhere;
 }
 
-.gemihub-diff-split-left {
+.kiokuflow-diff-split-left {
   border-right: 1px solid var(--background-modifier-border);
 }
 
-.gemihub-diff-split-filler {
+.kiokuflow-diff-split-filler {
   background: var(--background-secondary-alt, var(--background-secondary));
 }
 
@@ -382,21 +382,21 @@
    Word-Level Diff Highlighting
    ======================================== */
 
-.gemihub-diff-word-added {
+.kiokuflow-diff-word-added {
   background: rgba(0, 200, 83, 0.35);
   border-radius: 2px;
 }
 
-.gemihub-diff-word-removed {
+.kiokuflow-diff-word-removed {
   background: rgba(255, 100, 100, 0.35);
   border-radius: 2px;
 }
 
-.theme-dark .gemihub-diff-word-added {
+.theme-dark .kiokuflow-diff-word-added {
   background: rgba(0, 200, 83, 0.25);
 }
 
-.theme-dark .gemihub-diff-word-removed {
+.theme-dark .kiokuflow-diff-word-removed {
   background: rgba(255, 100, 100, 0.25);
 }
 
@@ -404,12 +404,12 @@
    Drag Handle
    ======================================== */
 
-.gemihub-drag-handle {
+.kiokuflow-drag-handle {
   cursor: move;
   user-select: none;
 }
 
-.gemihub-drag-handle button {
+.kiokuflow-drag-handle button {
   cursor: pointer;
 }
 
@@ -417,12 +417,12 @@
    Resize Handles
    ======================================== */
 
-.gemihub-resize-handle {
+.kiokuflow-resize-handle {
   position: absolute;
   z-index: 100;
 }
 
-.gemihub-resize-n {
+.kiokuflow-resize-n {
   top: -4px;
   left: 10px;
   right: 10px;
@@ -430,7 +430,7 @@
   cursor: n-resize;
 }
 
-.gemihub-resize-s {
+.kiokuflow-resize-s {
   bottom: -4px;
   left: 10px;
   right: 10px;
@@ -438,7 +438,7 @@
   cursor: s-resize;
 }
 
-.gemihub-resize-e {
+.kiokuflow-resize-e {
   top: 10px;
   right: -4px;
   bottom: 10px;
@@ -446,7 +446,7 @@
   cursor: e-resize;
 }
 
-.gemihub-resize-w {
+.kiokuflow-resize-w {
   top: 10px;
   left: -4px;
   bottom: 10px;
@@ -454,7 +454,7 @@
   cursor: w-resize;
 }
 
-.gemihub-resize-ne {
+.kiokuflow-resize-ne {
   top: -4px;
   right: -4px;
   width: 14px;
@@ -462,7 +462,7 @@
   cursor: ne-resize;
 }
 
-.gemihub-resize-nw {
+.kiokuflow-resize-nw {
   top: -4px;
   left: -4px;
   width: 14px;
@@ -470,7 +470,7 @@
   cursor: nw-resize;
 }
 
-.gemihub-resize-se {
+.kiokuflow-resize-se {
   bottom: -4px;
   right: -4px;
   width: 14px;
@@ -478,7 +478,7 @@
   cursor: se-resize;
 }
 
-.gemihub-resize-sw {
+.kiokuflow-resize-sw {
   bottom: -4px;
   left: -4px;
   width: 14px;
@@ -490,27 +490,27 @@
    Conflict Modal
    ======================================== */
 
-.gemihub-conflict-modal {
+.kiokuflow-conflict-modal {
   max-width: 800px;
 }
 
-.gemihub-conflict-item {
+.kiokuflow-conflict-item {
   border-bottom: 1px solid var(--background-modifier-border);
 }
 
-.gemihub-conflict-item:last-child {
+.kiokuflow-conflict-item:last-child {
   border-bottom: none;
 }
 
-.gemihub-conflict-item .setting-item {
+.kiokuflow-conflict-item .setting-item {
   border-bottom: none;
 }
 
-.gemihub-conflict-item .setting-item-control {
+.kiokuflow-conflict-item .setting-item-control {
   gap: 8px;
 }
 
-.gemihub-conflict-resolving-status {
+.kiokuflow-conflict-resolving-status {
   text-align: center;
   margin-top: 8px;
   color: var(--text-muted);
@@ -521,7 +521,7 @@
    Drive Management Modals (Temp, Conflict Backup, Trash)
    ======================================== */
 
-.gemihub-drive-manage-modal .gemihub-drive-file-list {
+.kiokuflow-drive-manage-modal .kiokuflow-drive-file-list {
   max-height: 400px;
   overflow-y: auto;
   border: 1px solid var(--background-modifier-border);
@@ -529,11 +529,11 @@
   margin: 8px 0;
 }
 
-.gemihub-drive-manage-modal .gemihub-drive-file-list .setting-item {
+.kiokuflow-drive-manage-modal .kiokuflow-drive-file-list .setting-item {
   padding: 8px 12px;
 }
 
-.gemihub-drive-manage-modal .gemihub-drive-modal-footer {
+.kiokuflow-drive-manage-modal .kiokuflow-drive-modal-footer {
   display: flex;
   justify-content: flex-end;
   gap: 8px;
@@ -542,7 +542,7 @@
   border-top: 1px solid var(--background-modifier-border);
 }
 
-.gemihub-drive-manage-modal .gemihub-drive-modal-processing {
+.kiokuflow-drive-manage-modal .kiokuflow-drive-modal-processing {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -552,23 +552,23 @@
   color: var(--text-muted);
 }
 
-.gemihub-drive-manage-modal .gemihub-drive-modal-processing .spinner {
+.kiokuflow-drive-manage-modal .kiokuflow-drive-modal-processing .spinner {
   display: inline-block;
   width: 24px;
   height: 24px;
   border: 3px solid var(--background-modifier-border);
   border-top-color: var(--interactive-accent);
   border-radius: 50%;
-  animation: gemihub-spin 0.8s linear infinite;
+  animation: kiokuflow-spin 0.8s linear infinite;
 }
 
-@keyframes gemihub-spin {
+@keyframes kiokuflow-spin {
   to {
     transform: rotate(360deg);
   }
 }
 
-.gemihub-drive-manage-modal .gemihub-drive-preview-panel {
+.kiokuflow-drive-manage-modal .kiokuflow-drive-preview-panel {
   border: 1px solid var(--background-modifier-border);
   border-radius: 4px;
   margin: 0 0 4px;
@@ -576,7 +576,7 @@
   overflow: auto;
 }
 
-.gemihub-drive-manage-modal .gemihub-drive-preview-panel pre {
+.kiokuflow-drive-manage-modal .kiokuflow-drive-preview-panel pre {
   font-family: var(--font-monospace);
   font-size: 12px;
   line-height: 1.5;
@@ -586,7 +586,7 @@
   word-break: break-all;
 }
 
-.gemihub-drive-manage-modal .gemihub-drive-preview-loading {
+.kiokuflow-drive-manage-modal .kiokuflow-drive-preview-loading {
   padding: 12px;
   color: var(--text-muted);
   text-align: center;

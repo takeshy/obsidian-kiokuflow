@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { GemiHubPlugin } from "../src/plugin";
+import type { KiokuflowPlugin } from "../src/plugin";
 import { DriveSyncUIManager } from "../src/plugin/driveSyncUI";
 
 const { prompt } = vi.hoisted(() => ({ prompt: vi.fn() }));
@@ -22,7 +22,7 @@ function setup(secretId = "gemihub-password") {
     saveSettings: vi.fn(async () => undefined),
     settings: { driveSync: { passwordSecretId: secretId } },
     driveSyncManager: mgr,
-  } as unknown as GemiHubPlugin;
+  } as unknown as KiokuflowPlugin;
   return { mgr, getSecret, plugin, ui: new DriveSyncUIManager(plugin) };
 }
 
@@ -97,7 +97,7 @@ describe("Drive sync Secret Storage unlock", () => {
     prompt.mockResolvedValueOnce({ password: "verified-password", savePassword: true });
     await ui.promptDriveSyncUnlock();
     const id = plugin.settings.driveSync.passwordSecretId;
-    expect(id).toMatch(/^gemihub-drive-password-/);
+    expect(id).toMatch(/^kiokuflow-drive-password-/);
     expect(plugin.app.secretStorage.setSecret).toHaveBeenCalledWith(id, "verified-password");
     expect(plugin.saveSettings).toHaveBeenCalledOnce();
     expect(JSON.stringify(plugin.settings)).not.toContain("verified-password");

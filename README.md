@@ -1,18 +1,18 @@
-# GemiHub - Drive Sync for Obsidian
+# kiokuflow - Drive Sync for Obsidian
 
-Sync your Obsidian vault with Google Drive, fully compatible with [GemiHub](https://gemihub.net). Edit notes in Obsidian and access them from GemiHub's web interface, or vice versa.
+Sync your Obsidian vault with Google Drive, fully compatible with [kiokuflow](https://kiokuflow.net). Edit notes in Obsidian and access them from kiokuflow's web interface, or vice versa.
 
-## What is GemiHub?
+## What is kiokuflow?
 
-[GemiHub](https://gemihub.net) is a web application that turns Google Gemini into a personal AI assistant integrated with your Google Drive.
+[kiokuflow](https://kiokuflow.net) is a web application that turns Google Gemini into a personal AI assistant integrated with your Google Drive.
 
-![GemiHub Interface](docs/images/gemihub_connection/push_pull.png)
+![kiokuflow Interface](docs/images/gemihub_connection/push_pull.png)
 
-### GemiHub-exclusive features
+### kiokuflow-exclusive features
 
-These features are only available through GemiHub's web interface:
+These features are only available through kiokuflow's web interface:
 
-- **Automatic RAG** - Files synced to GemiHub are automatically indexed for semantic search
+- **Automatic RAG** - Files synced to kiokuflow are automatically indexed for semantic search
 - **OAuth2-enabled MCP** - Use MCP servers that require OAuth2 authentication (e.g., Google Calendar, Gmail, Google Docs)
 - **Markdown to PDF/HTML conversion** - Convert Markdown notes to formatted PDF or HTML documents
 - **Public publishing** - Publish documents with a shareable public URL
@@ -21,23 +21,29 @@ These features are only available through GemiHub's web interface:
 
 - **Bidirectional sync with diff preview** - Push and pull files with a detailed file list and unified diff view before committing changes
 - **Conflict resolution with diff** - Color-coded unified diff to help decide which version to keep
-- **Drive edit history** - Track changes from both Obsidian and GemiHub, with per-file history entries showing origin (local/remote)
+- **Drive edit history** - Track changes from both Obsidian and kiokuflow, with per-file history entries showing origin (local/remote)
 - **Conflict backup management** - Browse, preview, and restore conflict backups stored on Drive
-- **Automatic RAG registration** - Pushed files are automatically registered to GemiHub's RAG store when a Google API key is configured
+- **Automatic RAG registration** - Pushed files are automatically registered to kiokuflow's RAG store when a Google API key is configured
 
 ## Sync Overview
 
 - **Bidirectional sync** - Push local changes to Drive, pull remote changes to Obsidian
-- **GemiHub compatible** - Uses the same `_sync-meta.json` format and encrypted auth from GemiHub
+- **kiokuflow compatible** - Uses the same `_sync-meta.json` format and encrypted auth from kiokuflow
 - **Conflict resolution** - Detects and resolves conflicts when both sides edit the same file
 - **Selective sync** - Exclude files/folders with pattern matching
 - **Binary support** - Syncs images, PDFs, and other binary files
 
+## Upgrading from GemiHub
+
+The repository/package name is now `obsidian-kiokuflow`, and the Obsidian plugin ID is `kiokuflow` (previously `gemihub`). Disable the old plugin before enabling the new one. Keep the old plugin installed for the first launch: if the new plugin has no saved settings, it imports the old plugin's settings, including encrypted auth and the selected Secret Storage entry. After checking the imported settings, you can uninstall the old plugin.
+
+Local sync tracking, RAG state and conflict backups continue to use the existing `GemiHub/` folder and `gemini-workspace.json` filename. Keep these paths unchanged. The shared RAG key and `gemihub-sync-core` dependency also retain their existing names for compatibility. Drive sync uses the folder ID from the exported token, so renaming the app or Drive folder does not switch workspaces.
+
 ## Prerequisites
 
-You need a [GemiHub](https://gemihub.net) account with Google Drive sync configured. The plugin uses GemiHub's encrypted authentication token to connect to your Google Drive.
+You need a [kiokuflow](https://kiokuflow.net) account with Google Drive sync configured. The plugin uses kiokuflow's encrypted authentication token to connect to your Google Drive.
 
-1. Sign in to GemiHub
+1. Sign in to kiokuflow
 2. Go to **Settings** → **Obsidian Sync** section
 3. Copy the **Migration Tool token**
 
@@ -45,12 +51,12 @@ You need a [GemiHub](https://gemihub.net) account with Google Drive sync configu
 
 ## Setup
 
-1. Open Obsidian **Settings** → **GemiHub - Drive Sync** → scroll to **Google Drive sync**
+1. Open Obsidian **Settings** → **kiokuflow - Drive Sync** → scroll to **Google Drive sync**
 2. Toggle **Enable drive sync** on
 
 ![Enable Drive Sync](docs/images/gemihub_connection/setting_drive_sync.png)
 
-3. Paste the **Migration Tool token** from GemiHub
+3. Paste the **Migration Tool token** from kiokuflow
 4. Click **Setup** to fetch the encrypted auth from Google Drive
 
 ![Migration Tool Token Setup](docs/images/gemihub_connection/setting_migration_tool_token.png)
@@ -59,7 +65,7 @@ You need a [GemiHub](https://gemihub.net) account with Google Drive sync configu
 
 ![Drive Sync Unlock](docs/images/gemihub_connection/start_with_sync.png)
 
-> Requires Obsidian 1.11.4 or later. To unlock automatically after restarting, select or create a secret containing your GemiHub password under **Password in Secret Storage** in the plugin settings. Only the secret name is saved in plugin settings. Configure the secret on each device; clear the selection to return to manual entry. If the secret is missing or unlock fails, the password prompt appears. Resetting auth clears the selection but leaves the secret in Obsidian's Secret Storage.
+> Requires Obsidian 1.11.4 or later. To unlock automatically after restarting, select or create a secret containing your kiokuflow password under **Password in Secret Storage** in the plugin settings. Only the secret name is saved in plugin settings. Configure the secret on each device; clear the selection to return to manual entry. If the secret is missing or unlock fails, the password prompt appears. Resetting auth clears the selection but leaves the secret in Obsidian's Secret Storage.
 
 ## How Sync Works
 
@@ -73,13 +79,13 @@ All vault files are stored **flat** in the root folder on Drive. The file name o
 | `daily/2024-01-15.md` | `daily/2024-01-15.md` |
 | `attachments/image.png` | `attachments/image.png` |
 
-This means there are no subfolders on Drive (except for system folders like `trash/`, `sync_conflicts/`, `__TEMP__/`). GemiHub uses the same flat structure.
+This means there are no subfolders on Drive (except for system folders like `trash/`, `sync_conflicts/`, `__TEMP__/`). kiokuflow uses the same flat structure.
 
 ### Sync Metadata
 
 Two metadata files track sync state:
 
-- **`_sync-meta.json`** (on Drive) - Shared with GemiHub. Contains file IDs, checksums, and timestamps for all synced files.
+- **`_sync-meta.json`** (on Drive) - Shared with kiokuflow. Contains file IDs, checksums, and timestamps for all synced files.
 - **`GemiHub/drive-sync-meta.json`** (local) - Maps vault paths to Drive file IDs and stores last-synced checksums.
 
 ### Push
@@ -92,7 +98,7 @@ Uploads local changes to Google Drive.
 4. Uploads new/modified files to Drive
 5. Moves locally deleted files to `trash/` on Drive (soft delete)
 6. Updates `_sync-meta.json` on Drive
-7. Syncs eligible files to GemiHub's RAG store (background, if configured)
+7. Syncs eligible files to kiokuflow's RAG store (background, if configured)
 
 ![Push to Drive](docs/images/gemihub_connection/push.png)
 
@@ -151,7 +157,7 @@ When conflicts are resolved, the losing version is saved in `sync_conflicts/` on
 
 ### Temporary Files
 
-Files temporarily saved by GemiHub are stored in `__TEMP__/` on Drive. You can:
+Files temporarily saved by kiokuflow are stored in `__TEMP__/` on Drive. You can:
 
 - **Apply** - Apply temporary file content to the corresponding Drive file
 - **Delete** - Remove temporary files
@@ -163,7 +169,7 @@ All three management modals support file preview and batch operations.
 | Setting | Description | Default |
 |---|---|---|
 | **Enable drive sync** | Toggle the sync feature | Off |
-| **Migration Tool token** | Paste from GemiHub settings (Obsidian Sync section) | - |
+| **Migration Tool token** | Paste from kiokuflow settings (Obsidian Sync section) | - |
 | **Auto sync check** | Periodically check for remote changes and update counts | Off |
 | **Sync check interval** | How often to check (minutes) | 5 |
 | **Exclude patterns** | Paths to exclude (one per line, supports `*` wildcards) | `node_modules/` |
@@ -208,8 +214,8 @@ No `_sync-meta.json` exists on Drive. Run **Push to drive** to initialize sync.
 
 ### Password unlock fails
 
-- Verify you are using the same password as in GemiHub
-- If you have changed your password in GemiHub, use **Reset auth** in settings and re-setup with a new Migration Tool token
+- Verify you are using the same password as in kiokuflow
+- If you have changed your password in kiokuflow, use **Reset auth** in settings and re-setup with a new Migration Tool token
 
 ### Conflict modal keeps appearing
 
@@ -217,8 +223,8 @@ Both sides have changes. Resolve all conflicts by choosing local or remote for e
 
 ## Related Repositories
 
-- [GemiHub](https://gemihub.net) — the web app this plugin syncs with
-- [gemihub-sync-core](https://github.com/takeshy/gemihub-sync-core) — shared sync library used by this plugin, GemiHub and the GemiHub Desktop plugin: `_sync-meta.json` protocol and storage, Google Drive REST client, sync exclusion and file type rules, conflict backup names, and encryption / external sync credentials. The sync behavior described above comes from this library, so all clients handle the same Drive folder identically.
+- [kiokuflow](https://kiokuflow.net) — the web app this plugin syncs with
+- [gemihub-sync-core](https://github.com/takeshy/gemihub-sync-core) — shared sync library used by this plugin, kiokuflow and the kiokuflow Desktop plugin: `_sync-meta.json` protocol and storage, Google Drive REST client, sync exclusion and file type rules, conflict backup names, and encryption / external sync credentials. The sync behavior described above comes from this library, so all clients handle the same Drive folder identically.
 
 ## License
 

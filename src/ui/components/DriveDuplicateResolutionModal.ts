@@ -22,10 +22,10 @@ export class DriveDuplicateResolutionModal extends Modal {
   }
 
   onOpen(): void {
-    this.modalEl.addClass("gemihub-sync-diff-modal");
+    this.modalEl.addClass("kiokuflow-sync-diff-modal");
     this.contentEl.createEl("h2", { text: t("driveSync.duplicateTitle") });
     this.contentEl.createEl("p", { text: t("driveSync.duplicateDesc"), cls: "setting-item-description" });
-    const list = this.contentEl.createDiv({ cls: "gemihub-sync-diff-list" });
+    const list = this.contentEl.createDiv({ cls: "kiokuflow-sync-diff-list" });
     for (const group of this.groups) this.renderGroup(list, group);
 
     const footer = new Setting(this.contentEl);
@@ -43,11 +43,11 @@ export class DriveDuplicateResolutionModal extends Modal {
   }
 
   private renderGroup(list: HTMLElement, group: DuplicateRemoteFileGroup): void {
-    const item = list.createDiv({ cls: "gemihub-sync-diff-file" });
+    const item = list.createDiv({ cls: "kiokuflow-sync-diff-file" });
     item.createEl("h3", { text: group.path });
-    const choices = item.createDiv({ cls: "gemihub-duplicate-choices" });
+    const choices = item.createDiv({ cls: "kiokuflow-duplicate-choices" });
     for (const file of group.files) {
-      const label = choices.createEl("label", { cls: "gemihub-duplicate-choice" });
+      const label = choices.createEl("label", { cls: "kiokuflow-duplicate-choice" });
       const radio = label.createEl("input", { type: "radio" });
       radio.name = `duplicate-${group.path}`;
       radio.checked = this.selected.get(group.path) === file.id;
@@ -56,18 +56,18 @@ export class DriveDuplicateResolutionModal extends Modal {
       label.createSpan({ text: `${file.name} · ${date} · ${file.size ? `${file.size} bytes · ` : ""}${file.id}` });
     }
     if (!isBinaryExtension(group.path) && group.files.length >= 2) {
-      const button = item.createEl("button", { cls: "gemihub-sync-diff-toggle" });
+      const button = item.createEl("button", { cls: "kiokuflow-sync-diff-toggle" });
       const icon = button.createSpan(); setIcon(icon, "git-compare");
       button.createSpan({ text: t("driveSync.diff") });
-      const panel = item.createDiv({ cls: "gemihub-sync-diff-panel gemihub-hidden" });
+      const panel = item.createDiv({ cls: "kiokuflow-sync-diff-panel kiokuflow-hidden" });
       button.addEventListener("click", () => void this.showDiff(group, panel));
     }
   }
 
   private async showDiff(group: DuplicateRemoteFileGroup, panel: HTMLElement): Promise<void> {
-    panel.removeClass("gemihub-hidden");
+    panel.removeClass("kiokuflow-hidden");
     panel.empty();
-    panel.createDiv({ cls: "gemihub-sync-diff-loading", text: t("driveSync.loading") });
+    panel.createDiv({ cls: "kiokuflow-sync-diff-loading", text: t("driveSync.loading") });
     try {
       const selectedId = this.selected.get(group.path) ?? group.files[0]?.id;
       const selected = group.files.find(file => file.id === selectedId) ?? group.files[0];
@@ -80,14 +80,14 @@ export class DriveDuplicateResolutionModal extends Modal {
       panel.empty();
       for (let index = 0; index < others.length; index++) {
         panel.createEl("h4", { text: `${selected.id} ↔ ${others[index].id}` });
-        const toggle = panel.createDiv({ cls: "gemihub-sync-diff-toggle-bar" });
+        const toggle = panel.createDiv({ cls: "kiokuflow-sync-diff-toggle-bar" });
         const renderer = renderDiffView(panel, selectedContent, otherContents[index] ?? "", "split");
         createDiffViewToggle(toggle, renderer);
         this.renderers.push(renderer);
       }
     } catch {
       panel.empty();
-      panel.createDiv({ cls: "gemihub-sync-diff-error", text: t("driveSync.failedToLoadDiff") });
+      panel.createDiv({ cls: "kiokuflow-sync-diff-error", text: t("driveSync.failedToLoadDiff") });
     }
   }
 

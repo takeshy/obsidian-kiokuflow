@@ -1,6 +1,6 @@
-import type { GemiHubPlugin } from "src/plugin";
+import type { KiokuflowPlugin } from "src/plugin";
 
 export interface SettingsContext {
-  plugin: GemiHubPlugin;
+  plugin: KiokuflowPlugin;
   display: () => void;
 }

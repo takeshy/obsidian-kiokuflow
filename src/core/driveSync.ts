@@ -1,10 +1,10 @@
 // Main Google Drive sync engine for Obsidian.
 // Manages push/pull sync between Obsidian Vault and Google Drive.
-// Adapted from GemiHub's useSync.ts hook — restructured as a class.
+// Adapted from kiokuflow's useSync.ts hook — restructured as a class.
 
 import { App, TFile, Notice, Platform, type EventRef } from "obsidian";
 import { t } from "src/i18n";
-import type { GemiHubPlugin } from "src/plugin";
+import type { KiokuflowPlugin } from "src/plugin";
 import { type DriveSyncSettings, type DriveSessionTokens, WORKSPACE_FOLDER } from "src/types";
 import type { RagFileInfo } from "src/types";
 import {
@@ -20,7 +20,6 @@ import {
   refreshAccessToken,
   getValidSessionTokens,
 } from "./googleDriveAuth";
-import { ensureRootFolder } from "./googleDrive";
 import * as drive from "./googleDrive";
 import {
   computeSyncDiff,
@@ -225,7 +224,7 @@ export interface ConflictBackupEntry {
 
 export class DriveSyncManager {
   private app: App;
-  private plugin: GemiHubPlugin;
+  private plugin: KiokuflowPlugin;
   private syncLock = false;
   private refreshCountsPromise: Promise<void> | null = null;
   private autoSyncInterval: ReturnType<typeof setInterval> | null = null;
@@ -253,7 +252,7 @@ export class DriveSyncManager {
     this.onStatusChange?.();
   }
 
-  constructor(app: App, plugin: GemiHubPlugin) {
+  constructor(app: App, plugin: KiokuflowPlugin) {
     this.app = app;
     this.plugin = plugin;
   }
@@ -302,8 +301,15 @@ export class DriveSyncManager {
       auth.data, auth.encryptedPrivateKey, auth.salt, password
     );
 
-    // Get a fresh access token via GemiHub API proxy
+    // Get a fresh access token via kiokuflow API proxy
     const refreshed = await refreshAccessToken(apiOrigin, refreshToken, auth.rootFolderId);
+
+    // The exported token identifies the workspace. A display-name change must
+    // never select a different folder or reset local tracking.
+    const rootFolder = await drive.getFileMetadata(refreshed.accessToken, auth.rootFolderId);
+    if (rootFolder.trashed || rootFolder.mimeType !== "application/vnd.google-apps.folder") {
+      throw new Error("The configured Drive sync folder is unavailable. Export a new Migration Tool token from kiokuflow.");
+    }
 
     this.sessionTokens = {
       accessToken: refreshed.accessToken,
@@ -312,58 +318,6 @@ export class DriveSyncManager {
       expiryTime: refreshed.expiryTime,
       rootFolderId: auth.rootFolderId,
     };
-
-    // Verify root folder still exists and update if needed
-    const rootFolderId = await ensureRootFolder(
-      this.sessionTokens.accessToken, this.settings.rootFolderName
-    );
-    if (rootFolderId !== auth.rootFolderId) {
-      this.sessionTokens.rootFolderId = rootFolderId;
-      this.plugin.settings.driveSync.encryptedAuth = {
-        ...auth,
-        rootFolderId,
-      };
-      await this.plugin.saveSettings();
-
-      // Back up locally modified files before resetting
-      const localMeta = await readLocalSyncMeta(this.app);
-      if (Object.keys(localMeta.files).length > 0) {
-        const vaultFiles = await this.getAllVaultFiles();
-        const { checksums } = await this.computeVaultChecksums(vaultFiles, localMeta);
-        const { modifiedIds } = this.findLocallyModifiedFiles(localMeta, checksums);
-        const idToPath = buildIdToPathMap(localMeta);
-        let backupCount = 0;
-        for (const fileId of modifiedIds) {
-          const path = idToPath[fileId];
-          if (!path) continue;
-          try {
-            if (await this.app.vault.adapter.exists(path)) {
-              if (isBinaryExtension(path)) {
-                const buf = await this.app.vault.adapter.readBinary(path);
-                await saveConflictBackup(this.app, path, buf);
-              } else {
-                const content = await this.app.vault.adapter.read(path);
-                await saveConflictBackup(this.app, path, content);
-              }
-              backupCount++;
-            }
-          } catch (err) {
-            console.warn(`[DriveSync] Failed to back up modified file: ${path}`, err);
-          }
-        }
-        if (backupCount > 0) {
-          new Notice(`Drive sync: backed up ${backupCount} modified file(s) to ${getConflictBackupFolder()}.`);
-        }
-      }
-
-      // Reset local sync meta so next push/pull works against the new folder
-      await writeLocalSyncMeta(this.app, {
-        lastUpdatedAt: "",
-        files: {},
-        pathToId: {},
-      });
-      new Notice("Drive sync: root folder changed. Local sync state has been reset.");
-    }
 
     this.startAutoSync();
     this.startVaultWatcher();
@@ -570,7 +524,7 @@ export class DriveSyncManager {
 
   /**
    * Google Workspace files (Sheets/Docs/etc.) cannot be downloaded via
-   * Drive's alt=media endpoint. GemiHub owns those through Workspace APIs, so
+   * Drive's alt=media endpoint. kiokuflow owns those through Workspace APIs, so
    * Obsidian sync ignores them while preserving their entries in remote meta.
    */
   private getObsidianSyncableRemoteMeta(remoteMeta: SyncMeta | null): SyncMeta | null {
@@ -906,7 +860,7 @@ export class DriveSyncManager {
   /**
    * Read remote sync meta and reconcile with actual Drive file listing in both
    * directions.
-   * - Files deleted externally (GemiHub web, Drive UI, another device) may still
+   * - Files deleted externally (kiokuflow web, Drive UI, another device) may still
    *   be listed in _sync-meta.json; remove stale entries so pull can detect them.
    * - Files added to the sync root without a metadata entry (external upload, or
    *   a push interrupted between the upload and the metadata write) are adopted.
@@ -924,7 +878,7 @@ export class DriveSyncManager {
     const caseInsensitivePaths = Platform.isWin || Platform.isMacOS || Platform.isIosApp;
     // Stale entries are verified by ID (Drive trash, permanent delete, moved out
     // of the root), drifted entries adopt the Drive state, and untracked files
-    // are adopted — the rules shared with GemiHub web and Desktop.
+    // are adopted — the rules shared with kiokuflow web and Desktop.
     const { meta } = await syncMetaStore.readReconciled(accessToken, rootFolderId, {
       rebuildIfMissing: false,
       // Excluded names are owned by another tool and must not become pull candidates.
@@ -1453,7 +1407,7 @@ export class DriveSyncManager {
       // but are temporarily missing from Obsidian's index.
       // Skip excluded paths: an excluded file shows up here because
       // getAllVaultFiles filters it out, so findLocallyModifiedFiles treats
-      // it as disappeared — but it's managed by another tool (e.g. GemiHub
+      // it as disappeared — but it's managed by another tool (e.g. kiokuflow
       // owns `web/`) and must not be trashed on Drive.
       const candidateTrash = [
         ...diff.localOnly.filter(id => {
@@ -1569,7 +1523,7 @@ export class DriveSyncManager {
     checksums: Map<string, string>,
     // Full Push rebuilds remoteMeta from scratch, so the entry being replaced
     // is not in `remoteMeta`; the caller passes the pre-push entry to keep
-    // GemiHub's publish state (shared/webViewLink/publicPath) on the file.
+    // kiokuflow's publish state (shared/webViewLink/publicPath) on the file.
     previousEntry?: FileSyncMeta
   ): Promise<{ oldContent: string | null; newContent: string | null }> {
     // Read via adapter so Obsidian-unindexed extensions (html, css, js, etc.) upload.
@@ -2194,7 +2148,7 @@ export class DriveSyncManager {
       const reusableRemoteIds = new Set(existingRemoteFiles.map((file) => file.id));
 
       // Build fresh remote meta (full push = local is authoritative for
-      // Obsidian-syncable files, but preserves Google Workspace files for GemiHub).
+      // Obsidian-syncable files, but preserves Google Workspace files for kiokuflow).
       const remoteMeta: SyncMeta = {
         lastUpdatedAt: new Date().toISOString(),
         files: Object.fromEntries(
@@ -2252,7 +2206,7 @@ export class DriveSyncManager {
 
       // Move remote-only files to trash so full push makes Drive match the local vault.
       // Preserve files at excluded paths — they're owned by another tool
-      // (e.g. GemiHub's `web/`) that syncs to the same Drive folder.
+      // (e.g. kiokuflow's `web/`) that syncs to the same Drive folder.
       const trackedIds = new Set(Object.keys(remoteMeta.files));
       const filesToTrash = existingRemoteFiles.filter((file) => {
         if (trackedIds.has(file.id)) return false;
@@ -2811,7 +2765,7 @@ export class DriveSyncManager {
 
   /**
    * Save a vault file to __TEMP__/ on Drive.
-   * Mirrors GemiHub's saveTempFile logic (overwrite if same name exists).
+   * Mirrors kiokuflow's saveTempFile logic (overwrite if same name exists).
    * Returns { fileId, fileName } for use by callers.
    */
   async saveTempFile(vaultPath: string): Promise<{ fileId: string; fileName: string }> {
@@ -2867,7 +2821,7 @@ export class DriveSyncManager {
     const idToPath = buildIdToPathMap(localMeta);
     let vaultPath = payload.filePath ?? idToPath[payload.fileId];
     if (!vaultPath) {
-      // Legacy/GemiHub payloads do not carry filePath. Resolve the real Drive
+      // Legacy/kiokuflow payloads do not carry filePath. Resolve the real Drive
       // name instead of ever treating the opaque Drive ID as a vault path.
       const tokens = await this.getTokens();
       vaultPath = (await drive.getFileMetadata(tokens.accessToken, payload.fileId)).name;
@@ -2936,11 +2890,12 @@ export class DriveSyncManager {
   // RAG Sync (after push)
   // ========================================
 
-  private static readonly GEMIHUB_RAG_STORE_KEY = "gemihub";
+  // Shared persisted key; kiokuflow web also retains this for existing RAG stores.
+  private static readonly DEFAULT_RAG_STORE_KEY = "gemihub";
   private static readonly RAG_CONCURRENCY = 5;
 
   /**
-   * Sync files to the gemihub RAG store after a successful push.
+   * Sync files to the kiokuflow RAG store after a successful push.
    * Handles deletions, renames, and new/modified file uploads with checksum-based skip.
    */
   private async syncRagAfterPush(
@@ -2953,7 +2908,7 @@ export class DriveSyncManager {
     // 1. Precondition checks
     if (!this.plugin.settings.ragEnabled) return;
 
-    const ragSetting = this.plugin.workspaceState.ragSettings[DriveSyncManager.GEMIHUB_RAG_STORE_KEY];
+    const ragSetting = this.plugin.workspaceState.ragSettings[DriveSyncManager.DEFAULT_RAG_STORE_KEY];
     if (!ragSetting) return;
     if (!ragSetting.storeId) return;
     if (ragSetting.isExternal) return;
@@ -3054,24 +3009,24 @@ export class DriveSyncManager {
     }
 
     // 6. Update local workspace state
-    this.plugin.workspaceState.ragSettings[DriveSyncManager.GEMIHUB_RAG_STORE_KEY] = {
+    this.plugin.workspaceState.ragSettings[DriveSyncManager.DEFAULT_RAG_STORE_KEY] = {
       ...ragSetting,
       files: updatedFiles,
     };
     await this.plugin.saveWorkspaceState();
 
-    // 7. Update gemihub settings.json on Drive
-    await this.updateGemihubSettingsOnDrive(accessToken, rootFolderId, updatedFiles);
+    // 7. Update kiokuflow settings.json on Drive
+    await this.updateKiokuflowSettingsOnDrive(accessToken, rootFolderId, updatedFiles);
 
     console.debug(`[DriveSync] RAG sync completed: ${Object.keys(updatedFiles).length} files tracked`);
   }
 
   /**
-   * Update gemihub's settings.json on Drive with the current RAG file tracking info.
+   * Update kiokuflow's settings.json on Drive with the current RAG file tracking info.
    * Reads existing settings, merges ragSettings["gemihub"].files with status: "registered",
    * and writes back to Drive.
    */
-  private async updateGemihubSettingsOnDrive(
+  private async updateKiokuflowSettingsOnDrive(
     accessToken: string,
     rootFolderId: string,
     files: Record<string, RagFileInfo>
@@ -3098,20 +3053,20 @@ export class DriveSyncManager {
         settings.ragSettings = {} as Record<string, unknown>;
       }
       const ragSettings = settings.ragSettings as Record<string, Record<string, unknown>>;
-      if (!ragSettings[DriveSyncManager.GEMIHUB_RAG_STORE_KEY]) {
-        ragSettings[DriveSyncManager.GEMIHUB_RAG_STORE_KEY] = {};
+      if (!ragSettings[DriveSyncManager.DEFAULT_RAG_STORE_KEY]) {
+        ragSettings[DriveSyncManager.DEFAULT_RAG_STORE_KEY] = {};
       }
-      const storeSettings = ragSettings[DriveSyncManager.GEMIHUB_RAG_STORE_KEY];
+      const storeSettings = ragSettings[DriveSyncManager.DEFAULT_RAG_STORE_KEY];
 
-      // Merge files with status: "registered" for gemihub compatibility
-      const gemihubFiles: Record<string, RagFileInfo & { status: string }> = {};
+      // Merge files with status: "registered" for kiokuflow compatibility
+      const registeredFiles: Record<string, RagFileInfo & { status: string }> = {};
       for (const [path, info] of Object.entries(files)) {
-        gemihubFiles[path] = { ...info, status: "registered" };
+        registeredFiles[path] = { ...info, status: "registered" };
       }
-      storeSettings.files = gemihubFiles;
+      storeSettings.files = registeredFiles;
 
       // Copy storeId from local ragSetting
-      const localRagSetting = this.plugin.workspaceState.ragSettings[DriveSyncManager.GEMIHUB_RAG_STORE_KEY];
+      const localRagSetting = this.plugin.workspaceState.ragSettings[DriveSyncManager.DEFAULT_RAG_STORE_KEY];
       if (localRagSetting) {
         storeSettings.storeId = localRagSetting.storeId;
         storeSettings.storeName = localRagSetting.storeName;
@@ -3120,7 +3075,7 @@ export class DriveSyncManager {
       // Set ragEnabled and selectedRagSetting if files are registered
       if (Object.keys(files).length > 0) {
         settings.ragEnabled = true;
-        settings.selectedRagSetting = DriveSyncManager.GEMIHUB_RAG_STORE_KEY;
+        settings.selectedRagSetting = DriveSyncManager.DEFAULT_RAG_STORE_KEY;
       }
 
       // Write back to Drive
@@ -3131,7 +3086,7 @@ export class DriveSyncManager {
         await drive.createFile(accessToken, SETTINGS_FILE_NAME, content, rootFolderId, "application/json");
       }
     } catch (err) {
-      console.debug("[DriveSync] Failed to update gemihub settings.json on Drive:", err);
+      console.debug("[DriveSync] Failed to update kiokuflow settings.json on Drive:", err);
     }
   }
 

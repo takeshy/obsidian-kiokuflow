@@ -1,8 +1,8 @@
 {
-	"id": "gemihub",
-	"name": "GemiHub - Drive Sync",
+	"id": "kiokuflow",
+	"name": "kiokuflow - Drive Sync",
 	"minAppVersion": "1.11.4",
-	"description": "Sync your Obsidian vault with Google Drive via GemiHub.",
+	"description": "Sync your Obsidian vault with Google Drive via kiokuflow.",
 	"author": "takeshy",
 	"authorUrl": "https://github.com/takeshy",
 	"isDesktopOnly": false,

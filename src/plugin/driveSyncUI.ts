@@ -6,16 +6,16 @@ import { DriveAuthPasswordModal } from "src/ui/components/DriveAuthPasswordModal
 import { DriveDuplicateResolutionModal } from "src/ui/components/DriveDuplicateResolutionModal";
 import { formatError } from "src/utils/error";
 import { t } from "src/i18n";
-import type { GemiHubPlugin } from "src/plugin";
+import type { KiokuflowPlugin } from "src/plugin";
 
 export class DriveSyncUIManager {
-  private plugin: GemiHubPlugin;
+  private plugin: KiokuflowPlugin;
   private statusBarEl: HTMLElement | null = null;
   private pushRibbonEl: HTMLElement | null = null;
   private pullRibbonEl: HTMLElement | null = null;
   private unlockPromise: Promise<void> | null = null;
 
-  constructor(plugin: GemiHubPlugin) {
+  constructor(plugin: KiokuflowPlugin) {
     this.plugin = plugin;
   }
 
@@ -74,7 +74,7 @@ export class DriveSyncUIManager {
       if (result.savePassword) {
         const previousId = this.plugin.settings.driveSync.passwordSecretId;
         try {
-          const id = previousId || `gemihub-drive-password-${crypto.randomUUID()}`;
+          const id = previousId || `kiokuflow-drive-password-${crypto.randomUUID()}`;
           this.plugin.app.secretStorage.setSecret(id, result.password);
           this.plugin.settings.driveSync.passwordSecretId = id;
           await this.plugin.saveSettings();
@@ -111,7 +111,7 @@ export class DriveSyncUIManager {
     // Create status bar element if not exists
     if (!this.statusBarEl) {
       this.statusBarEl = this.plugin.addStatusBarItem();
-      this.statusBarEl.addClass("gemihub-drive-sync-status");
+      this.statusBarEl.addClass("kiokuflow-drive-sync-status");
       this.statusBarEl.addEventListener("click", (e) => {
         this.showMenu(e);
       });
@@ -127,7 +127,7 @@ export class DriveSyncUIManager {
         }
         void this.showSyncDiffAndExecute(currentMgr, "push");
       });
-      this.pushRibbonEl.addClass("gemihub-drive-sync-ribbon");
+      this.pushRibbonEl.addClass("kiokuflow-drive-sync-ribbon");
     }
 
     if (!this.pullRibbonEl) {
@@ -139,7 +139,7 @@ export class DriveSyncUIManager {
         }
         void this.showSyncDiffAndExecute(currentMgr, "pull");
       });
-      this.pullRibbonEl.addClass("gemihub-drive-sync-ribbon");
+      this.pullRibbonEl.addClass("kiokuflow-drive-sync-ribbon");
     }
 
     // Listen for status changes
@@ -161,10 +161,10 @@ export class DriveSyncUIManager {
       const label = local > 0 ? t("driveSync.ribbonPushCount", { count: String(local) }) : t("driveSync.ribbonPush");
       this.pushRibbonEl.setAttribute("aria-label", label);
       // Update badge
-      let badge = this.pushRibbonEl.querySelector(".gemihub-sync-badge");
+      let badge = this.pushRibbonEl.querySelector(".kiokuflow-sync-badge");
       if (local > 0) {
         if (!badge) {
-          badge = this.pushRibbonEl.createSpan({ cls: "gemihub-sync-badge" });
+          badge = this.pushRibbonEl.createSpan({ cls: "kiokuflow-sync-badge" });
         }
         badge.textContent = String(local);
       } else {
@@ -176,10 +176,10 @@ export class DriveSyncUIManager {
       const label = remote > 0 ? t("driveSync.ribbonPullCount", { count: String(remote) }) : t("driveSync.ribbonPull");
       this.pullRibbonEl.setAttribute("aria-label", label);
       // Update badge
-      let badge = this.pullRibbonEl.querySelector(".gemihub-sync-badge");
+      let badge = this.pullRibbonEl.querySelector(".kiokuflow-sync-badge");
       if (remote > 0) {
         if (!badge) {
-          badge = this.pullRibbonEl.createSpan({ cls: "gemihub-sync-badge" });
+          badge = this.pullRibbonEl.createSpan({ cls: "kiokuflow-sync-badge" });
         }
         badge.textContent = String(remote);
       } else {
@@ -194,11 +194,11 @@ export class DriveSyncUIManager {
 
     const mgr = this.mgr;
     if (!mgr || !mgr.isConfigured) {
-      el.toggleClass("gemihub-hidden", true);
+      el.toggleClass("kiokuflow-hidden", true);
       return;
     }
 
-    el.toggleClass("gemihub-hidden", false);
+    el.toggleClass("kiokuflow-hidden", false);
 
     if (!mgr.isUnlocked) {
       el.setText(t("driveSync.statusLocked"));

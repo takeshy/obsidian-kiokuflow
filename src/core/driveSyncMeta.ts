@@ -1,6 +1,6 @@
 // Sync metadata management for Google Drive sync.
 // Manages both local (Vault) and remote (Drive) sync metadata.
-// Adapted from GemiHub's sync-meta.server.ts.
+// Adapted from kiokuflow's sync-meta.server.ts.
 
 import type { App } from "obsidian";
 import { WORKSPACE_FOLDER } from "../types";
@@ -91,7 +91,7 @@ export function buildIdToPathMap(meta: LocalDriveSyncMeta): Record<string, strin
 // ========================================
 
 // Reading (with duplicate consolidation), reconciliation and writing are
-// shared with GemiHub web and Desktop (gemihub-sync-core/sync-meta). Bound
+// shared with kiokuflow web and Desktop (gemihub-sync-core/sync-meta). Bound
 // through this module's imports so tests can replace the Drive module.
 export const syncMetaStore = createSyncMetaStore({
   findFilesByExactName: (token, name, parentId) => findFilesByExactName(token, name, parentId),
@@ -233,7 +233,7 @@ export function restorePathFromConflictBackupName(name: string): string {
   }
 }
 
-/** Original vault path of a backup, from any GemiHub client's name format. */
+/** Original vault path of a backup, from any kiokuflow client's name format. */
 export function restoreOriginalPathFromConflictBackupName(name: string): string {
   return parseConflictBackupName(name).originalPath;
 }

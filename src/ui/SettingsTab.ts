@@ -1,12 +1,12 @@
 import { PluginSettingTab, App } from "obsidian";
-import type { GemiHubPlugin } from "src/plugin";
+import type { KiokuflowPlugin } from "src/plugin";
 import type { SettingsContext } from "src/ui/settings/settingsContext";
 import { displayDriveSyncSettings } from "src/ui/settings/driveSyncSettings";
 
 export class SettingsTab extends PluginSettingTab {
-  plugin: GemiHubPlugin;
+  plugin: KiokuflowPlugin;
 
-  constructor(app: App, plugin: GemiHubPlugin) {
+  constructor(app: App, plugin: KiokuflowPlugin) {
     super(app, plugin);
     this.plugin = plugin;
   }

@@ -1,4 +1,4 @@
-// Workspace folder constant
+// Keep the existing local storage path so sync tracking and backups survive rebranding.
 export const WORKSPACE_FOLDER = "GemiHub";
 
 // Google Drive Sync settings
@@ -34,7 +34,7 @@ export const DEFAULT_DRIVE_SYNC_SETTINGS: DriveSyncSettings = {
   excludePatterns: ["node_modules/", ".*"],
   autoSync: false,
   syncIntervalMinutes: 5,
-  rootFolderName: "gemihub",
+  rootFolderName: "kiokuflow",
 };
 
 // Edit history settings (used by drive edit history)
@@ -90,13 +90,13 @@ export const DEFAULT_WORKSPACE_STATE: WorkspaceState = {
 };
 
 // Plugin settings
-export interface GemiHubSettings {
+export interface KiokuflowSettings {
   driveSync: DriveSyncSettings;
   editHistory: EditHistorySettings;
   ragEnabled: boolean;
 }
 
-export const DEFAULT_SETTINGS: GemiHubSettings = {
+export const DEFAULT_SETTINGS: KiokuflowSettings = {
   driveSync: DEFAULT_DRIVE_SYNC_SETTINGS,
   editHistory: DEFAULT_EDIT_HISTORY_SETTINGS,
   ragEnabled: false,

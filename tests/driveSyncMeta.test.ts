@@ -228,7 +228,7 @@ describe("remote meta mutation helpers", () => {
     expect(meta.lastUpdatedAt).not.toBe("old");
   });
 
-  it("upsert keeps GemiHub publish state that Drive does not return", () => {
+  it("upsert keeps kiokuflow publish state that Drive does not return", () => {
     const meta: SyncMeta = {
       lastUpdatedAt: "old",
       files: {

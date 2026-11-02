@@ -163,6 +163,8 @@ export class FakeVault {
 
   // ---- Vault ---------------------------------------------------------------
 
+  read = async (file: TFile): Promise<string> => this.adapter.read(file.path);
+
   getAbstractFileByPath = (path: string): TAbstractFile | null => {
     if (this.files.has(path)) {
       const content = this.files.get(path)!;
@@ -217,6 +219,7 @@ export function createFakeApp(vault: FakeVault) {
       adapter: vault.adapter,
       configDir: vault.configDir,
       getAbstractFileByPath: vault.getAbstractFileByPath,
+      read: vault.read,
       create: vault.create,
       createBinary: vault.createBinary,
       modify: vault.modify,

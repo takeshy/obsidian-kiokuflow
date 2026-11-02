@@ -41,7 +41,7 @@ export class DriveSyncConflictModal extends Modal {
     const { contentEl } = this;
     contentEl.empty();
     this.diffStates = {};
-    contentEl.addClass("gemihub-conflict-modal");
+    contentEl.addClass("kiokuflow-conflict-modal");
 
     // Prevent closing by clicking outside
     this.containerEl.setCssProps({ "pointer-events": "none" });
@@ -53,14 +53,14 @@ export class DriveSyncConflictModal extends Modal {
       cls: "setting-item-description",
     });
 
-    const listEl = contentEl.createDiv({ cls: "gemihub-conflict-list" });
+    const listEl = contentEl.createDiv({ cls: "kiokuflow-conflict-list" });
 
     for (const conflict of this.conflicts) {
       this.renderConflictItem(listEl, conflict);
     }
 
     // Bulk actions
-    const bulkContainer = contentEl.createDiv({ cls: "gemihub-button-container" });
+    const bulkContainer = contentEl.createDiv({ cls: "kiokuflow-button-container" });
 
     const keepAllLocalBtn = bulkContainer.createEl("button", {
       text: t("driveSync.keepAllLocal"),
@@ -88,7 +88,7 @@ export class DriveSyncConflictModal extends Modal {
     });
 
     if (this.resolving) {
-      this.statusEl = contentEl.createDiv({ cls: "gemihub-conflict-resolving-status" });
+      this.statusEl = contentEl.createDiv({ cls: "kiokuflow-conflict-resolving-status" });
       this.statusEl.setText(this.progressText());
     } else {
       this.statusEl = null;
@@ -109,7 +109,7 @@ export class DriveSyncConflictModal extends Modal {
       ? t("driveSync.localEditRemoteDelete")
       : `Local: ${conflict.localChecksum.slice(0, 8)}... | Remote: ${conflict.remoteChecksum.slice(0, 8)}...`;
 
-    const itemEl = container.createDiv({ cls: "gemihub-conflict-item" });
+    const itemEl = container.createDiv({ cls: "kiokuflow-conflict-item" });
 
     // Declare diffPanel before use in click handler; element created after Setting for correct DOM order
     let diffPanel: HTMLElement | null = null;
@@ -171,7 +171,7 @@ export class DriveSyncConflictModal extends Modal {
 
     // Diff panel placed after Setting for correct DOM order
     if (canDiff) {
-      diffPanel = itemEl.createDiv({ cls: "gemihub-sync-diff-panel gemihub-hidden" });
+      diffPanel = itemEl.createDiv({ cls: "kiokuflow-sync-diff-panel kiokuflow-hidden" });
     }
   }
 
@@ -185,7 +185,7 @@ export class DriveSyncConflictModal extends Modal {
     // If already loaded, toggle visibility
     if (state?.diff !== null && state?.diff !== undefined && !state.error) {
       state.expanded = !state.expanded;
-      panel.toggleClass("gemihub-hidden", !state.expanded);
+      panel.toggleClass("kiokuflow-hidden", !state.expanded);
       toggleBtn.setText(state.expanded ? t("driveSync.hide") : t("driveSync.diff"));
       return;
     }
@@ -193,16 +193,16 @@ export class DriveSyncConflictModal extends Modal {
     // Prevent duplicate requests while loading
     if (state?.loading) {
       state.expanded = !state.expanded;
-      panel.toggleClass("gemihub-hidden", !state.expanded);
+      panel.toggleClass("kiokuflow-hidden", !state.expanded);
       toggleBtn.setText(state.expanded ? t("driveSync.hide") : t("driveSync.diff"));
       return;
     }
 
     // Show loading
     this.diffStates[conflict.fileId] = { loading: true, diff: null, error: false, expanded: true };
-    panel.toggleClass("gemihub-hidden", false);
+    panel.toggleClass("kiokuflow-hidden", false);
     panel.empty();
-    panel.createDiv({ cls: "gemihub-sync-diff-loading", text: t("driveSync.loading") });
+    panel.createDiv({ cls: "kiokuflow-sync-diff-loading", text: t("driveSync.loading") });
     toggleBtn.setText(t("driveSync.hide"));
 
     try {
@@ -242,30 +242,30 @@ export class DriveSyncConflictModal extends Modal {
     } catch {
       this.diffStates[conflict.fileId] = { loading: false, diff: null, error: true, expanded: true };
       panel.empty();
-      panel.createDiv({ cls: "gemihub-sync-diff-error", text: t("driveSync.failedToLoadDiff") });
+      panel.createDiv({ cls: "kiokuflow-sync-diff-error", text: t("driveSync.failedToLoadDiff") });
     }
   }
 
   private renderDiffView(container: HTMLElement, patch: string): void {
-    const pre = container.createEl("pre", { cls: "gemihub-sync-diff-content" });
+    const pre = container.createEl("pre", { cls: "kiokuflow-sync-diff-content" });
     const lines = patch.split("\n");
 
     for (const line of lines) {
       const div = pre.createDiv();
 
       if (line.startsWith("+") && !line.startsWith("+++")) {
-        div.addClass("gemihub-diff-add");
+        div.addClass("kiokuflow-diff-add");
       } else if (line.startsWith("-") && !line.startsWith("---")) {
-        div.addClass("gemihub-diff-remove");
+        div.addClass("kiokuflow-diff-remove");
       } else if (line.startsWith("@@")) {
-        div.addClass("gemihub-diff-hunk");
+        div.addClass("kiokuflow-diff-hunk");
       } else if (line.startsWith("+++") || line.startsWith("---")) {
-        div.addClass("gemihub-diff-header");
+        div.addClass("kiokuflow-diff-header");
       }
 
       // Separate prefix from content (prefix is non-selectable)
       if ((line.startsWith("+") || line.startsWith("-")) && !line.startsWith("+++") && !line.startsWith("---")) {
-        const prefix = div.createSpan({ cls: "gemihub-diff-prefix" });
+        const prefix = div.createSpan({ cls: "kiokuflow-diff-prefix" });
         prefix.setText(line[0]);
         div.appendText(line.slice(1));
       } else {

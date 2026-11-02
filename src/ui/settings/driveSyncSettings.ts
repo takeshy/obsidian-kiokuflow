@@ -52,7 +52,7 @@ export function displayDriveSyncSettings(containerEl: HTMLElement, ctx: Settings
       .addText((text) => {
         text.setPlaceholder(t("driveSync.backupTokenPlaceholder"));
         text.inputEl.type = "password";
-        text.inputEl.addClass("gemihub-backup-token-input");
+        text.inputEl.addClass("kiokuflow-backup-token-input");
         const inputEl = text.inputEl;
 
         new Setting(containerEl)
