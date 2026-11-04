@@ -164,6 +164,10 @@ Files temporarily saved by kiokuflow are stored in `__TEMP__/` on Drive. You can
 
 All three management modals support file preview and batch operations.
 
+The temporary-file list loads names and dates only. Preview loads one selected payload and releases it when another preview is opened or the dialog closes. Applying selected files reads and applies one payload at a time; deleting files does not download their contents. Binary previews show a file notice instead of rendering encoded attachment data.
+
+On mobile, background change counts reuse session-only hashes for unchanged files watched by Obsidian. File changes invalidate those hashes. Unindexed files are still read on each check, and explicit sync previews, Push and Pull rehash mobile files to detect edits that preserve their size and modification time. File contents are never kept in this hash cache.
+
 ## Settings
 
 | Setting | Description | Default |

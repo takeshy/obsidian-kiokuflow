@@ -1,6 +1,6 @@
 {
   "name": "obsidian-kiokuflow",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "Sync Obsidian vault with Google Drive via kiokuflow",
   "main": "main.js",
   "scripts": {

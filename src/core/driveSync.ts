@@ -230,6 +230,10 @@ export class DriveSyncManager {
   private autoSyncInterval: ReturnType<typeof setInterval> | null = null;
   private vaultEventRefs: EventRef[] = [];
   private vaultChangeDebounceTimer: ReturnType<typeof setTimeout> | null = null;
+  // Hashes only; file bodies are never retained. Mobile background counts may
+  // reuse these while Vault events are watched. Explicit sync always rehashes.
+  private vaultChecksums = new Map<string, { mtime: number; size: number; checksum: string }>();
+  private vaultChecksumRevision = 0;
 
   // Session-only tokens (never persisted to disk)
   private sessionTokens: DriveSessionTokens | null = null;
@@ -566,10 +570,15 @@ export class DriveSyncManager {
    */
   private async computeVaultChecksums(
     files: VaultFileEntry[],
-    localMeta?: LocalDriveSyncMeta
+    localMeta?: LocalDriveSyncMeta,
+    verifyMobileContents = true,
   ): Promise<{ checksums: Map<string, string>; vaultStats: Map<string, { mtime: number; size: number }> }> {
     const checksums = new Map<string, string>();
     const vaultStats = new Map<string, { mtime: number; size: number }>();
+    const paths = new Set(files.map(file => file.path));
+    for (const path of this.vaultChecksums.keys()) {
+      if (!paths.has(path)) this.vaultChecksums.delete(path);
+    }
 
     // Build path → cached entry lookup from localMeta (with CI fallback for NTFS/macOS)
     const cachedByPath = new Map<string, { md5Checksum: string; localMtime?: number; localSize?: number }>();
@@ -591,6 +600,12 @@ export class DriveSyncManager {
           const mtime = file.stat.mtime;
           const size = file.stat.size;
           vaultStats.set(file.path, { mtime, size });
+          const watched = this.vaultEventRefs.length > 0 && this.app.vault.getAbstractFileByPath(file.path) instanceof TFile;
+          const sessionCached = this.vaultChecksums.get(file.path);
+          if (Platform.isMobile && !verifyMobileContents && watched && sessionCached?.mtime === mtime && sessionCached.size === size) {
+            checksums.set(file.path, sessionCached.checksum);
+            return;
+          }
 
           // Skip MD5 if mtime+size unchanged from cached values
           const cached = cachedByPath.get(file.path)
@@ -599,18 +614,26 @@ export class DriveSyncManager {
           // edit can also preserve the byte length. Reusing the cached hash in
           // that case makes real changes (notably .desktop/.workflow edits)
           // disappear from the push list. Desktop filesystems provide reliable
-          // enough stat changes for this optimization; mobile always re-hashes.
+          // enough stat changes for this optimization. Mobile explicit sync
+          // always rehashes; only watched background counts use session hashes.
           if (!Platform.isMobile && cached?.localMtime === mtime && cached?.localSize === size && cached.md5Checksum) {
             checksums.set(file.path, cached.md5Checksum);
             return;
           }
 
+          const revision = this.vaultChecksumRevision;
+          let checksum: string;
           if (isBinaryExtension(file.path)) {
             const content = await this.app.vault.adapter.readBinary(file.path);
-            checksums.set(file.path, md5Hash(new Uint8Array(content)));
+            checksum = md5Hash(new Uint8Array(content));
           } else {
             const content = await this.app.vault.adapter.read(file.path);
-            checksums.set(file.path, md5HashString(content));
+            checksum = md5HashString(content);
+          }
+          checksums.set(file.path, checksum);
+          // An edit during the read must not repopulate an invalidated cache.
+          if (Platform.isMobile && watched && revision === this.vaultChecksumRevision) {
+            this.vaultChecksums.set(file.path, { mtime, size, checksum });
           }
         } catch (err) {
           console.warn(`[DriveSync] Skipping file (read error): ${file.path}`, err);
@@ -987,7 +1010,7 @@ export class DriveSyncManager {
       const syncLocalMeta = this.getObsidianSyncableLocalMeta(localMeta, remoteMeta);
 
       const vaultFiles = await this.getAllVaultFiles();
-      const { checksums } = await this.computeVaultChecksums(vaultFiles, syncLocalMeta);
+      const { checksums } = await this.computeVaultChecksums(vaultFiles, syncLocalMeta, false);
       const { modifiedIds, newPaths, renames, deletedIds } = this.findLocallyModifiedFiles(syncLocalMeta, checksums);
 
       const diff = computeSyncDiff(syncLocalMeta, syncRemoteMeta, modifiedIds);
@@ -1070,7 +1093,7 @@ export class DriveSyncManager {
     try {
       const localMeta = await readLocalSyncMeta(this.app);
       const vaultFiles = await this.getAllVaultFiles();
-      const { checksums } = await this.computeVaultChecksums(vaultFiles, localMeta);
+      const { checksums } = await this.computeVaultChecksums(vaultFiles, localMeta, false);
       const { modifiedIds, newPaths, renames, deletedIds } = this.findLocallyModifiedFiles(localMeta, checksums);
 
       const idToPath = buildIdToPathMap(localMeta);
@@ -1108,7 +1131,13 @@ export class DriveSyncManager {
     this.stopVaultWatcher();
     if (!this.settings.enabled || !this.sessionTokens) return;
 
-    const debouncedRefresh = () => {
+    const debouncedRefresh = (file: { path: string }, oldPath?: string) => {
+      this.vaultChecksumRevision++;
+      for (const path of this.vaultChecksums.keys()) {
+        if ([file.path, oldPath].some(changed => changed && (path.toLowerCase() === changed.toLowerCase() || path.toLowerCase().startsWith(changed.toLowerCase() + "/")))) {
+          this.vaultChecksums.delete(path);
+        }
+      }
       if (this.vaultChangeDebounceTimer) clearTimeout(this.vaultChangeDebounceTimer);
       this.vaultChangeDebounceTimer = setTimeout(() => {
         void this.refreshLocalCounts();
@@ -1124,6 +1153,8 @@ export class DriveSyncManager {
   }
 
   stopVaultWatcher(): void {
+    this.vaultChecksumRevision++;
+    this.vaultChecksums.clear();
     for (const ref of this.vaultEventRefs) {
       this.app.vault.offref(ref);
     }
@@ -2710,24 +2741,32 @@ export class DriveSyncManager {
   // Temp File Management (__TEMP__/ folder on Drive)
   // ========================================
 
-  async listTempFiles(): Promise<Array<{ file: drive.DriveFile; payload: TempFilePayload }>> {
+  async listTempFiles(): Promise<drive.DriveFile[]> {
     const tokens = await this.getTokens();
     const tempFolderId = await drive.ensureSubFolder(tokens.accessToken, tokens.rootFolderId, "__TEMP__");
     const files = await drive.listFiles(tokens.accessToken, tempFolderId);
 
-    const results: Array<{ file: drive.DriveFile; payload: TempFilePayload }> = [];
-    for (const file of files) {
-      if (file.name.startsWith("_")) continue;
-      try {
-        const raw = await drive.readFile(tokens.accessToken, file.id);
-        const payload: TempFilePayload = JSON.parse(raw);
-        results.push({ file, payload });
-      } catch (err) {
-        // skip malformed temp files
-        console.debug("[DriveSync] listTempFiles: skipping malformed temp file:", file.id, err);
-      }
+    return files.filter(file => !file.name.startsWith("_") && !isGoogleWorkspaceMimeType(file.mimeType));
+  }
+
+  /** Read one temporary payload only when previewing or applying it. */
+  async readTempFile(fileId: string): Promise<TempFilePayload> {
+    const tokens = await this.getTokens();
+    const payload: unknown = JSON.parse(await drive.readFile(tokens.accessToken, fileId));
+    if (!payload || typeof payload !== "object" ||
+      !("fileId" in payload) || typeof payload.fileId !== "string" || !payload.fileId ||
+      !("content" in payload) || typeof payload.content !== "string" ||
+      ("isBinary" in payload && typeof payload.isBinary !== "boolean") ||
+      ("filePath" in payload && (typeof payload.filePath !== "string" || !isValidVaultPath(payload.filePath))) ||
+      ("savedAt" in payload && typeof payload.savedAt !== "string")) {
+      throw new Error(t("driveSync.tempFilesInvalid"));
     }
-    return results;
+    return {
+      // Web text payloads omit isBinary; preserve their legacy text semantics.
+      fileId: payload.fileId, content: payload.content, isBinary: "isBinary" in payload && payload.isBinary === true,
+      ...("filePath" in payload && typeof payload.filePath === "string" ? { filePath: payload.filePath } : {}),
+      savedAt: "savedAt" in payload ? payload.savedAt as string : "",
+    };
   }
 
   async applyTempFile(tempFileId: string, payload: TempFilePayload): Promise<drive.DriveFile> {
