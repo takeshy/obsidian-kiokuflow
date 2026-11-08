@@ -7,6 +7,7 @@ import {
   WORKSPACE_FOLDER,
 } from "src/types";
 import { DriveSyncManager } from "src/core/driveSync";
+import { migrateWorkspaceFolder } from "src/core/workspaceMigration";
 import { DriveSyncUIManager } from "src/plugin/driveSyncUI";
 import { SettingsTab } from "src/ui/SettingsTab";
 import { t } from "src/i18n";
@@ -100,11 +101,11 @@ export class KiokuflowPlugin extends Plugin {
   // ---- Workspace state persistence ----
 
   async loadWorkspaceState(): Promise<void> {
+    await migrateWorkspaceFolder(this.app);
     const path = `${WORKSPACE_FOLDER}/${WORKSPACE_STATE_FILENAME}`;
-    const file = this.app.vault.getAbstractFileByPath(path);
-    if (file instanceof TFile) {
+    if (await this.app.vault.adapter.exists(path)) {
       try {
-        const raw = await this.app.vault.read(file);
+        const raw = await this.app.vault.adapter.read(path);
         const parsed = JSON.parse(raw);
         this.workspaceState = Object.assign(
           {},

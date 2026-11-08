@@ -37,7 +37,7 @@ These features are only available through kiokuflow's web interface:
 
 The repository/package name is now `obsidian-kiokuflow`, and the Obsidian plugin ID is `kiokuflow` (previously `gemihub`). Disable the old plugin before enabling the new one. Keep the old plugin installed for the first launch: if the new plugin has no saved settings, it imports the old plugin's settings, including encrypted auth and the selected Secret Storage entry. After checking the imported settings, you can uninstall the old plugin.
 
-Local sync tracking, RAG state and conflict backups continue to use the existing `GemiHub/` folder and `gemini-workspace.json` filename. Keep these paths unchanged. The shared RAG key and `gemihub-sync-core` dependency also retain their existing names for compatibility. Drive sync uses the folder ID from the exported token, so renaming the app or Drive folder does not switch workspaces.
+Local sync tracking, RAG state and conflict backups are stored in `KiokuFlow/`. On startup, the plugin automatically moves the existing `GemiHub/` folder and its contents to `KiokuFlow/`, keeping the `gemini-workspace.json` filename. If both folders exist, their contents are merged, and files from `GemiHub/` overwrite same-name files in `KiokuFlow/`. Both folders are excluded from sync. The shared RAG key and `gemihub-sync-core` dependency also retain their existing names for compatibility. Drive sync uses the folder ID from the exported token, so renaming the app or Drive folder does not switch workspaces.
 
 ## Prerequisites
 
@@ -86,7 +86,7 @@ This means there are no subfolders on Drive (except for system folders like `tra
 Two metadata files track sync state:
 
 - **`_sync-meta.json`** (on Drive) - Shared with kiokuflow. Contains file IDs, checksums, and timestamps for all synced files.
-- **`GemiHub/drive-sync-meta.json`** (local) - Maps vault paths to Drive file IDs and stores last-synced checksums.
+- **`KiokuFlow/drive-sync-meta.json`** (local) - Maps vault paths to Drive file IDs and stores last-synced checksums.
 
 ### Push
 
@@ -118,6 +118,8 @@ Downloads remote changes to the vault.
 ### Full Pull
 
 Replaces all local files with remote versions. Use this to reset your vault to match Drive.
+
+Files with the same path and MD5 checksum are kept without downloading or rewriting them. Sync tracking is rebuilt with the current Drive file IDs even when the contents are unchanged, so this also handles IDs changed by migration. Files without a remote checksum are downloaded normally. The completion notice shows downloaded and unchanged counts.
 
 > **Warning:** This deletes local files not present on Drive (moved to Obsidian trash).
 
@@ -196,7 +198,7 @@ The following are always excluded from sync:
 - `_sync-meta.json`, `settings.json`
 - `history/`, `trash/`, `sync_conflicts/`, `__TEMP__/`, `plugins/`, `.trash/`, `node_modules/`
 - Obsidian config directory (`.obsidian/` or custom)
-- Plugin workspace folder (`GemiHub/`)
+- Plugin workspace folders (`KiokuFlow/` and legacy `GemiHub/`)
 - User-defined exclude patterns from settings
 
 ### Exclude Pattern Syntax

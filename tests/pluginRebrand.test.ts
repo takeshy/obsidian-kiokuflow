@@ -71,7 +71,7 @@ describe("kiokuflow settings migration", () => {
     expect(vault.getFile(legacyPath)).toBe("{broken");
   });
 
-  it("continues reading existing sync tracking and RAG state and excludes storage from sync", async () => {
+  it("migrates sync tracking and RAG state to KiokuFlow before reading them", async () => {
     const { plugin, vault } = setup();
     const state = { ragSettings: { gemihub: { ...DEFAULT_RAG_SETTING, storeId: "original-store" } } };
     const meta = { lastUpdatedAt: "", files: {}, pathToId: { "notes/a.md": "file-a" } };
@@ -80,9 +80,11 @@ describe("kiokuflow settings migration", () => {
     await plugin.loadWorkspaceState();
     expect(plugin.workspaceState).toEqual(state);
     expect(await readLocalSyncMeta(plugin.app)).toEqual(meta);
+    expect(isSyncExcludedPath("KiokuFlow/drive-sync-meta.json")).toBe(true);
+    expect(isSyncExcludedPath("KiokuFlow/conflict-backups/backup.md")).toBe(true);
     expect(isSyncExcludedPath("GemiHub/drive-sync-meta.json")).toBe(true);
-    expect(isSyncExcludedPath("GemiHub/conflict-backups/backup.md")).toBe(true);
+    expect(await vault.adapter.exists("GemiHub")).toBe(false);
     await plugin.saveWorkspaceState();
-    expect(JSON.parse(vault.getFile("GemiHub/gemini-workspace.json")!)).toEqual(state);
+    expect(JSON.parse(vault.getFile("KiokuFlow/gemini-workspace.json")!)).toEqual(state);
   });
 });

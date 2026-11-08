@@ -5,7 +5,7 @@
 import { App, TFile, Notice, Platform, type EventRef } from "obsidian";
 import { t } from "src/i18n";
 import type { KiokuflowPlugin } from "src/plugin";
-import { type DriveSyncSettings, type DriveSessionTokens, WORKSPACE_FOLDER } from "src/types";
+import { type DriveSyncSettings, type DriveSessionTokens, WORKSPACE_FOLDER, LEGACY_WORKSPACE_FOLDER } from "src/types";
 import type { RagFileInfo } from "src/types";
 import {
   getFileSearchManager,
@@ -2071,17 +2071,49 @@ export class DriveSyncManager {
         pathToId: {},
       };
 
-      // Download all remote files
-      const fileIds = Object.keys(syncRemoteMeta.files);
+      // Rebuild tracking by path and current contents, independent of old Drive
+      // IDs. Full pull must rehash even when cached local stats are unchanged.
+      const fileIds = Object.keys(syncRemoteMeta.files).filter(id => {
+        const path = syncRemoteMeta.files[id].name;
+        return isValidVaultPath(path) && !this.isExcludedPath(path);
+      });
       let downloadedCount = 0;
+      let matchedCount = 0;
 
       for (let i = 0; i < fileIds.length; i += CONCURRENCY) {
         const batch = fileIds.slice(i, i + CONCURRENCY);
         // Refresh per batch: a whole-vault download can outlast the token.
         accessToken = (await this.getTokens()).accessToken;
         await Promise.all(batch.map(async (fileId) => {
+          const fileMeta = syncRemoteMeta.files[fileId];
+          const path = fileMeta.name;
+          let matches = false;
+          if (fileMeta.md5Checksum) {
+            try {
+              if ((await this.app.vault.adapter.stat(path))?.type === "file") {
+                const checksum = isBinaryExtension(path)
+                  ? md5Hash(new Uint8Array(await this.app.vault.adapter.readBinary(path)))
+                  : md5HashString(await this.app.vault.adapter.read(path));
+                matches = checksum === fileMeta.md5Checksum;
+              }
+            } catch (err) {
+              // A failed local check is never evidence of equality. Try the
+              // normal download, which will report any persistent write error.
+              console.warn(`[DriveSync] Full pull checksum failed: ${path}`, err);
+            }
+          }
+          if (matches) {
+            newLocalMeta.pathToId[path] = fileId;
+            newLocalMeta.files[fileId] = {
+              md5Checksum: fileMeta.md5Checksum,
+              modifiedTime: fileMeta.modifiedTime,
+              name: path,
+            };
+            matchedCount++;
+            return;
+          }
           await this.downloadFile(accessToken, rootFolderId, fileId, syncRemoteMeta, newLocalMeta);
-          downloadedCount++;
+          if (newLocalMeta.files[fileId]) downloadedCount++;
         }));
       }
 
@@ -2112,22 +2144,22 @@ export class DriveSyncManager {
       for (const f of await this.getAllVaultFiles()) {
         freshVaultStats.set(f.path, { mtime: f.stat.mtime, size: f.stat.size });
       }
-      // Only include files that were actually downloaded in localMeta.
+      // Only include downloaded or checksum-matched files in localMeta.
       // toLocalSyncMeta adds ALL remoteMeta entries, but files that were
       // skipped (excluded, invalid path, or not indexed by Obsidian) would
       // appear as false "deleted" items in subsequent push checks.
-      const downloadedIds = new Set(Object.keys(newLocalMeta.files));
+      const trackedIds = new Set(Object.keys(newLocalMeta.files));
       const filteredRemoteMeta: SyncMeta = {
         lastUpdatedAt: syncRemoteMeta.lastUpdatedAt,
         files: Object.fromEntries(
-          Object.entries(syncRemoteMeta.files).filter(([id]) => downloadedIds.has(id))
+          Object.entries(syncRemoteMeta.files).filter(([id]) => trackedIds.has(id))
         ),
       };
       const updatedLocalMeta = toLocalSyncMeta(filteredRemoteMeta, newLocalMeta, freshVaultStats);
       await writeLocalSyncMeta(this.app, updatedLocalMeta);
 
       this.syncStatus = "idle";
-      new Notice(`Drive sync: full pull completed (${downloadedCount} files)`);
+      new Notice(`Drive sync: full pull completed (${downloadedCount} downloaded, ${matchedCount} unchanged)`);
     } catch (err) {
       this.lastError = formatError(err);
       this.syncStatus = "error";
@@ -2959,7 +2991,9 @@ export class DriveSyncManager {
 
     // 2. Build filter config with workspace/.obsidian exclusions
     const excludePatterns = [...ragSetting.excludePatterns];
-    excludePatterns.push(`^${WORKSPACE_FOLDER.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}/`);
+    for (const folder of [WORKSPACE_FOLDER, LEGACY_WORKSPACE_FOLDER]) {
+      excludePatterns.push(`^${folder.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}/`);
+    }
     excludePatterns.push(`^\\.obsidian/`);
     const filterConfig: FilterConfig = {
       includeFolders: ragSetting.targetFolders,

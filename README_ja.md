@@ -37,7 +37,7 @@ Obsidian の Vault を Google Drive と同期し、[kiokuflow](https://kiokuflow
 
 リポジトリ・パッケージ名は `obsidian-kiokuflow`、Obsidian のプラグイン ID は `kiokuflow`（旧 `gemihub`）になりました。新プラグインを有効にする前に旧プラグインを無効にしてください。初回起動時は旧プラグインをインストールしたままにすると、新プラグインに保存済みの設定がない場合、暗号化認証や Secret Storage の選択を含む旧設定を自動で引き継ぎます。引き継いだ設定を確認してから旧プラグインをアンインストールできます。
 
-同期情報・RAG の状態・競合バックアップは、互換性のため既存の `GemiHub/` フォルダと `gemini-workspace.json` を継続して使います。これらのパスはそのまま維持してください。共通の RAG キーと依存ライブラリ `gemihub-sync-core` も維持します。Drive の同期先はエクスポートしたトークンのフォルダ ID で確認するため、アプリ名や Drive フォルダ名を変えても同期先は切り替わりません。
+同期情報・RAG の状態・競合バックアップは `KiokuFlow/` に保存します。起動時に既存の `GemiHub/` フォルダとその内容を自動的に `KiokuFlow/` へ移行します。ファイル名 `gemini-workspace.json` は維持します。両方のフォルダがある場合は内容を統合し、同名ファイルは `GemiHub/` 側の内容で `KiokuFlow/` 側を上書きします。両フォルダとも同期対象から除外します。共通の RAG キーと依存ライブラリ `gemihub-sync-core` も維持します。Drive の同期先はエクスポートしたトークンのフォルダ ID で確認するため、アプリ名や Drive フォルダ名を変えても同期先は切り替わりません。
 
 ## 事前準備
 
@@ -86,7 +86,7 @@ Drive 上にサブフォルダは作成されません（`trash/`、`sync_confli
 2つのメタデータファイルで同期状態を管理します：
 
 - **`_sync-meta.json`**（Drive 上） - kiokuflow と共有。同期対象ファイルの ID、チェックサム、タイムスタンプを保持。
-- **`GemiHub/drive-sync-meta.json`**（ローカル） - Vault パスと Drive ファイル ID のマッピング、最終同期時のチェックサムを保持。
+- **`KiokuFlow/drive-sync-meta.json`**（ローカル） - Vault パスと Drive ファイル ID のマッピング、最終同期時のチェックサムを保持。
 
 ### Push
 
@@ -118,6 +118,8 @@ Drive 上にサブフォルダは作成されません（`trash/`、`sync_confli
 ### Full Pull
 
 すべてのローカルファイルをリモートバージョンで置き換えます。Vault を Drive の状態に完全にリセットしたい場合に使用します。
+
+同じパスで MD5 チェックサムが一致するファイルは、ダウンロード・再書き込みを省略します。内容が同じでも現在の Drive ファイル ID で同期履歴を作り直すため、移行で ID が変わった場合にも対応します。リモートにチェックサムがないファイルは通常どおり取得します。完了通知にはダウンロード件数と変更なしの件数を表示します。
 
 > **注意:** Drive に存在しないローカルファイルは削除されます（Obsidian のゴミ箱に移動）。
 
@@ -196,7 +198,7 @@ kiokuflow が一時保存したファイルは Drive の `__TEMP__/` に格納�
 - `_sync-meta.json`, `settings.json`
 - `history/`, `trash/`, `sync_conflicts/`, `__TEMP__/`, `plugins/`, `.trash/`, `node_modules/`
 - Obsidian 設定ディレクトリ（`.obsidian/` またはカスタム設定）
-- プラグインワークスペースフォルダ（`GemiHub/`）
+- プラグインワークスペースフォルダ（`KiokuFlow/` と旧 `GemiHub/`）
 - 設定で定義したユーザー除外パターン
 
 ### 除外パターンの構文

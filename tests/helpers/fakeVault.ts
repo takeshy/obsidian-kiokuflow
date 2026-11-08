@@ -118,6 +118,32 @@ export class FakeVault {
       this.folders.add(path);
     },
 
+    rename: async (source: string, destination: string): Promise<void> => {
+      if (this.files.has(destination) || this.folders.has(destination)) throw new Error(`EEXIST: ${destination}`);
+      if (!this.files.has(source) && !this.folders.has(source)) throw new Error(`ENOENT: ${source}`);
+      const translate = (path: string) => destination + path.slice(source.length);
+      for (const [path, content] of [...this.files]) {
+        if (path !== source && !path.startsWith(`${source}/`)) continue;
+        this.files.set(translate(path), content);
+        this.mtimes.set(translate(path), this.mtimes.get(path)!);
+        this.files.delete(path);
+        this.mtimes.delete(path);
+      }
+      for (const path of [...this.folders]) {
+        if (path !== source && !path.startsWith(`${source}/`)) continue;
+        this.folders.delete(path);
+        this.folders.add(translate(path));
+      }
+      this.ensureParentFolders(destination);
+    },
+
+    rmdir: async (path: string, recursive: boolean): Promise<void> => {
+      if (recursive || [...this.files.keys(), ...this.folders].some(child => child.startsWith(`${path}/`))) {
+        throw new Error(`Directory must be empty: ${path}`);
+      }
+      if (!this.folders.delete(path)) throw new Error(`ENOENT: ${path}`);
+    },
+
     stat: async (path: string) => {
       this.counters.stat++;
       if (this.folders.has(path)) return { type: "folder" as const, mtime: 0, size: 0, ctime: 0 };
@@ -164,6 +190,13 @@ export class FakeVault {
   // ---- Vault ---------------------------------------------------------------
 
   read = async (file: TFile): Promise<string> => this.adapter.read(file.path);
+
+  rename = async (file: TAbstractFile, destination: string): Promise<void> => this.adapter.rename(file.path, destination);
+
+  delete = async (file: TAbstractFile): Promise<void> => {
+    if (file instanceof TFolder) await this.adapter.rmdir(file.path, false);
+    else await this.adapter.remove(file.path);
+  };
 
   getAbstractFileByPath = (path: string): TAbstractFile | null => {
     if (this.files.has(path)) {
@@ -220,6 +253,8 @@ export function createFakeApp(vault: FakeVault) {
       configDir: vault.configDir,
       getAbstractFileByPath: vault.getAbstractFileByPath,
       read: vault.read,
+      rename: vault.rename,
+      delete: vault.delete,
       create: vault.create,
       createBinary: vault.createBinary,
       modify: vault.modify,

@@ -7,7 +7,7 @@ import {
   SYNC_EXCLUDED_PREFIXES as CORE_SYNC_EXCLUDED_PREFIXES,
 } from "gemihub-sync-core/paths";
 import { guessMimeType, shouldTreatAsBinaryFile } from "gemihub-sync-core/files";
-import { WORKSPACE_FOLDER } from "../types";
+import { LEGACY_WORKSPACE_FOLDER, WORKSPACE_FOLDER } from "../types";
 
 export { SYNC_EXCLUDED_FILE_NAMES, isGoogleWorkspaceMimeType } from "gemihub-sync-core/paths";
 export { isBinaryMimeType, looksLikeBinary } from "gemihub-sync-core/files";
@@ -22,6 +22,7 @@ export function isSyncExcludedPath(filePath: string, userExcludePatterns: string
       ".trash/",
       // Plugin workspace folder (chat history, sync meta, conflict backups)
       `${WORKSPACE_FOLDER}/`,
+      `${LEGACY_WORKSPACE_FOLDER}/`,
       // Obsidian config directory (configurable via Vault.configDir)
       ...(configDir ? [`${configDir}/`] : []),
     ],

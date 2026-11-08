@@ -1,5 +1,5 @@
-// Keep the existing local storage path so sync tracking and backups survive rebranding.
-export const WORKSPACE_FOLDER = "GemiHub";
+export const WORKSPACE_FOLDER = "KiokuFlow";
+export const LEGACY_WORKSPACE_FOLDER = "GemiHub";
 
 // Google Drive Sync settings
 export interface DriveSyncSettings {
