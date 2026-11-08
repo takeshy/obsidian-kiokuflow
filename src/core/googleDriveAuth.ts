@@ -14,11 +14,11 @@ import {
   parseTokenRefreshResponse,
   type EncryptedAuthFile,
   type ExternalSyncCredentials,
-} from "gemihub-sync-core/auth";
+} from "kiokuflow-sync-core/auth";
 import type { DriveSessionTokens } from "src/types";
 
 // Token, _encrypted-auth.json and refresh message formats are shared with
-// kiokuflow web and Desktop (gemihub-sync-core/auth); only the transport
+// kiokuflow web and Desktop (kiokuflow-sync-core/auth); only the transport
 // (Obsidian requestUrl) lives here.
 
 /**

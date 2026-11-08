@@ -37,7 +37,7 @@ Obsidian の Vault を Google Drive と同期し、[kiokuflow](https://kiokuflow
 
 リポジトリ・パッケージ名は `obsidian-kiokuflow`、Obsidian のプラグイン ID は `kiokuflow`（旧 `gemihub`）になりました。新プラグインを有効にする前に旧プラグインを無効にしてください。初回起動時は旧プラグインをインストールしたままにすると、新プラグインに保存済みの設定がない場合、暗号化認証や Secret Storage の選択を含む旧設定を自動で引き継ぎます。引き継いだ設定を確認してから旧プラグインをアンインストールできます。
 
-同期情報・RAG の状態・競合バックアップは `KiokuFlow/` に保存します。起動時に既存の `GemiHub/` フォルダとその内容を自動的に `KiokuFlow/` へ移行します。ファイル名 `gemini-workspace.json` は維持します。両方のフォルダがある場合は内容を統合し、同名ファイルは `GemiHub/` 側の内容で `KiokuFlow/` 側を上書きします。両フォルダとも同期対象から除外します。共通の RAG キーと依存ライブラリ `gemihub-sync-core` も維持します。Drive の同期先はエクスポートしたトークンのフォルダ ID で確認するため、アプリ名や Drive フォルダ名を変えても同期先は切り替わりません。
+同期情報・RAG の状態・競合バックアップは `KiokuFlow/` に保存します。起動時に既存の `GemiHub/` フォルダとその内容を自動的に `KiokuFlow/` へ移行します。ファイル名 `gemini-workspace.json` は維持します。両方のフォルダがある場合は内容を統合し、同名ファイルは `GemiHub/` 側の内容で `KiokuFlow/` 側を上書きします。両フォルダとも同期対象から除外します。共通の RAG キーと依存ライブラリ `kiokuflow-sync-core` も維持します。Drive の同期先はエクスポートしたトークンのフォルダ ID で確認するため、アプリ名や Drive フォルダ名を変えても同期先は切り替わりません。
 
 ## 事前準備
 
@@ -230,7 +230,7 @@ Drive 上に `_sync-meta.json` が存在しません。**Push to drive** を実�
 ## 関連リポジトリ
 
 - [kiokuflow](https://kiokuflow.net) — このプラグインの同期先となる Web アプリ
-- [gemihub-sync-core](https://github.com/takeshy/gemihub-sync-core) — このプラグイン、kiokuflow、kiokuflow Desktop プラグインが共通で使う同期ライブラリ。`_sync-meta.json` のプロトコルと読み書き、Google Drive REST クライアント、同期除外とファイル種別の判定、コンフリクトバックアップの命名、暗号化と外部同期の認証情報を提供します。上記の同期の挙動はこのライブラリによるもので、同じ Drive フォルダをすべてのクライアントが同じ規則で扱います。
+- [kiokuflow-sync-core](https://github.com/takeshy/kiokuflow-sync-core) — このプラグイン、kiokuflow、kiokuflow Desktop プラグインが共通で使う同期ライブラリ。`_sync-meta.json` のプロトコルと読み書き、Google Drive REST クライアント、同期除外とファイル種別の判定、コンフリクトバックアップの命名、暗号化と外部同期の認証情報を提供します。上記の同期の挙動はこのライブラリによるもので、同じ Drive フォルダをすべてのクライアントが同じ規則で扱います。
 
 ## ライセンス
 

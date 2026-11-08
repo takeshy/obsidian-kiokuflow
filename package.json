@@ -39,6 +39,6 @@
   "dependencies": {
     "@google/genai": "^1.46.0",
     "diff": "^5.2.0",
-    "gemihub-sync-core": "github:takeshy/gemihub-sync-core#a3c4236e4b6a148d0b5884ece0252cc4af3a9572"
+    "kiokuflow-sync-core": "github:takeshy/kiokuflow-sync-core#a3c4236e4b6a148d0b5884ece0252cc4af3a9572"
   }
 }

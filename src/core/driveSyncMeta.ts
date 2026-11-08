@@ -7,8 +7,8 @@ import { WORKSPACE_FOLDER } from "../types";
 import {
   buildConflictBackupName as buildCoreConflictBackupName,
   parseConflictBackupName,
-} from "gemihub-sync-core/conflict";
-import { createSyncMetaStore, removeFilesFromMeta, upsertDriveFileInMeta } from "gemihub-sync-core/sync-meta";
+} from "kiokuflow-sync-core/conflict";
+import { createSyncMetaStore, removeFilesFromMeta, upsertDriveFileInMeta } from "kiokuflow-sync-core/sync-meta";
 import {
   listUserFiles,
   readFile,
@@ -91,7 +91,7 @@ export function buildIdToPathMap(meta: LocalDriveSyncMeta): Record<string, strin
 // ========================================
 
 // Reading (with duplicate consolidation), reconciliation and writing are
-// shared with kiokuflow web and Desktop (gemihub-sync-core/sync-meta). Bound
+// shared with kiokuflow web and Desktop (kiokuflow-sync-core/sync-meta). Bound
 // through this module's imports so tests can replace the Drive module.
 export const syncMetaStore = createSyncMetaStore({
   findFilesByExactName: (token, name, parentId) => findFilesByExactName(token, name, parentId),
@@ -220,7 +220,7 @@ export async function saveConflictBackup(
   }
 }
 
-/** Shared backup name format (see gemihub-sync-core/conflict). */
+/** Shared backup name format (see kiokuflow-sync-core/conflict). */
 export function buildConflictBackupName(filePath: string, now: Date = new Date()): string {
   return buildCoreConflictBackupName(filePath, now);
 }

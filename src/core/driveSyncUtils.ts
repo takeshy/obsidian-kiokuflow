@@ -1,16 +1,16 @@
 // Sync utility functions for Google Drive sync.
-// Exclusion and file type rules come from gemihub-sync-core (shared with
+// Exclusion and file type rules come from kiokuflow-sync-core (shared with
 // kiokuflow web and Desktop); only the Obsidian-specific folders live here.
 
 import {
   isSyncExcludedPath as isCoreSyncExcludedPath,
   SYNC_EXCLUDED_PREFIXES as CORE_SYNC_EXCLUDED_PREFIXES,
-} from "gemihub-sync-core/paths";
-import { guessMimeType, shouldTreatAsBinaryFile } from "gemihub-sync-core/files";
+} from "kiokuflow-sync-core/paths";
+import { guessMimeType, shouldTreatAsBinaryFile } from "kiokuflow-sync-core/files";
 import { LEGACY_WORKSPACE_FOLDER, WORKSPACE_FOLDER } from "../types";
 
-export { SYNC_EXCLUDED_FILE_NAMES, isGoogleWorkspaceMimeType } from "gemihub-sync-core/paths";
-export { isBinaryMimeType, looksLikeBinary } from "gemihub-sync-core/files";
+export { SYNC_EXCLUDED_FILE_NAMES, isGoogleWorkspaceMimeType } from "kiokuflow-sync-core/paths";
+export { isBinaryMimeType, looksLikeBinary } from "kiokuflow-sync-core/files";
 
 /** Shared system folders plus Obsidian's own trash folder. */
 export const SYNC_EXCLUDED_PREFIXES = [...CORE_SYNC_EXCLUDED_PREFIXES, ".trash/"];
@@ -44,4 +44,4 @@ export function isBinaryExtension(filePath: string): boolean {
 }
 
 // MD5 (pure JS, for Drive md5Checksum comparison) is shared too.
-export { md5Hash, md5HashString } from "gemihub-sync-core/hash";
+export { md5Hash, md5HashString } from "kiokuflow-sync-core/hash";

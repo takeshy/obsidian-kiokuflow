@@ -1,13 +1,13 @@
-// Sync diff types and computation. The protocol lives in gemihub-sync-core so
+// Sync diff types and computation. The protocol lives in kiokuflow-sync-core so
 // Obsidian, kiokuflow web and kiokuflow Desktop apply identical rules; this module
 // only adds the Obsidian-specific fields.
 
 import {
   computeSyncDiff as computeCoreSyncDiff,
   type FileSyncMeta as CoreFileSyncMeta,
-} from "gemihub-sync-core/protocol";
+} from "kiokuflow-sync-core/protocol";
 
-export { SYNC_META_FILE_NAME } from "gemihub-sync-core/protocol";
+export { SYNC_META_FILE_NAME } from "kiokuflow-sync-core/protocol";
 
 export interface FileSyncMeta extends CoreFileSyncMeta {
   path?: string;        // Vault relative path (Obsidian extension)
@@ -40,7 +40,7 @@ export interface SyncDiff {
 /** Minimal shape accepted as localMeta */
 type SyncMetaLike = { files: Record<string, { md5Checksum: string; modifiedTime: string; name?: string }> } | null;
 
-/** Compute sync diff by comparing two metadata snapshots (see gemihub-sync-core). */
+/** Compute sync diff by comparing two metadata snapshots (see kiokuflow-sync-core). */
 export function computeSyncDiff(
   localMeta: SyncMetaLike,
   remoteMeta: SyncMeta | null,

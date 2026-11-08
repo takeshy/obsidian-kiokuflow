@@ -1,6 +1,6 @@
 // Google Drive API client for Obsidian.
 // The REST client (requests, retries, pagination, multipart bodies, errors) is
-// shared with kiokuflow web and Desktop through gemihub-sync-core; this module
+// shared with kiokuflow web and Desktop through kiokuflow-sync-core; this module
 // only adapts Obsidian's requestUrl as the transport.
 
 import { requestUrl } from "obsidian";
@@ -10,9 +10,9 @@ import {
   type DriveFile,
   type DriveHttpRequest,
   type DriveHttpResponse,
-} from "gemihub-sync-core/drive";
+} from "kiokuflow-sync-core/drive";
 
-export { DriveApiError, isDriveNotFoundError, type DriveFile } from "gemihub-sync-core/drive";
+export { DriveApiError, isDriveNotFoundError, type DriveFile } from "kiokuflow-sync-core/drive";
 
 function toArrayBuffer(bytes: Uint8Array): ArrayBuffer {
   return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);

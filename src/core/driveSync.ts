@@ -28,7 +28,7 @@ import {
   type SyncDiff,
   type ConflictInfo,
 } from "./syncDiff";
-import { syncMetaSnapshotChanged } from "gemihub-sync-core/protocol";
+import { syncMetaSnapshotChanged } from "kiokuflow-sync-core/protocol";
 import {
   readLocalSyncMeta,
   writeLocalSyncMeta,

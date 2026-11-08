@@ -37,7 +37,7 @@ These features are only available through kiokuflow's web interface:
 
 The repository/package name is now `obsidian-kiokuflow`, and the Obsidian plugin ID is `kiokuflow` (previously `gemihub`). Disable the old plugin before enabling the new one. Keep the old plugin installed for the first launch: if the new plugin has no saved settings, it imports the old plugin's settings, including encrypted auth and the selected Secret Storage entry. After checking the imported settings, you can uninstall the old plugin.
 
-Local sync tracking, RAG state and conflict backups are stored in `KiokuFlow/`. On startup, the plugin automatically moves the existing `GemiHub/` folder and its contents to `KiokuFlow/`, keeping the `gemini-workspace.json` filename. If both folders exist, their contents are merged, and files from `GemiHub/` overwrite same-name files in `KiokuFlow/`. Both folders are excluded from sync. The shared RAG key and `gemihub-sync-core` dependency also retain their existing names for compatibility. Drive sync uses the folder ID from the exported token, so renaming the app or Drive folder does not switch workspaces.
+Local sync tracking, RAG state and conflict backups are stored in `KiokuFlow/`. On startup, the plugin automatically moves the existing `GemiHub/` folder and its contents to `KiokuFlow/`, keeping the `gemini-workspace.json` filename. If both folders exist, their contents are merged, and files from `GemiHub/` overwrite same-name files in `KiokuFlow/`. Both folders are excluded from sync. The shared RAG key and `kiokuflow-sync-core` dependency also retain their existing names for compatibility. Drive sync uses the folder ID from the exported token, so renaming the app or Drive folder does not switch workspaces.
 
 ## Prerequisites
 
@@ -230,7 +230,7 @@ Both sides have changes. Resolve all conflicts by choosing local or remote for e
 ## Related Repositories
 
 - [kiokuflow](https://kiokuflow.net) — the web app this plugin syncs with
-- [gemihub-sync-core](https://github.com/takeshy/gemihub-sync-core) — shared sync library used by this plugin, kiokuflow and the kiokuflow Desktop plugin: `_sync-meta.json` protocol and storage, Google Drive REST client, sync exclusion and file type rules, conflict backup names, and encryption / external sync credentials. The sync behavior described above comes from this library, so all clients handle the same Drive folder identically.
+- [kiokuflow-sync-core](https://github.com/takeshy/kiokuflow-sync-core) — shared sync library used by this plugin, kiokuflow and the kiokuflow Desktop plugin: `_sync-meta.json` protocol and storage, Google Drive REST client, sync exclusion and file type rules, conflict backup names, and encryption / external sync credentials. The sync behavior described above comes from this library, so all clients handle the same Drive folder identically.
 
 ## License
 
